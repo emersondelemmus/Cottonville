@@ -17,6 +17,9 @@
 \usepackage{tabto}
 \usepackage[utf8]{inputenc}
 \usepackage{tabularx}
+\usepackage{float}
+\usepackage{siunitx}
+\usepackage{dcolumn}
 \renewcommand\tabularxcolumn[1]{m{#1}}
 \hypersetup{
     colorlinks=false,
@@ -30,217 +33,334 @@
 \graphicspath{Images/}
 
 
+
+
 \begin{document}
 
-\title{Real Time Classification of Cotton Diseases with a Mobile App using Transfer Learning \\
+\title{Real-Time Classification of Cotton Diseases with a Mobile App using Transfer Learning \\}
 
+\makeatletter
+\newcommand{\linebreakand}{%
+  \end{@IEEEauthorhalign}
+  \hfill\mbox{}\par
+  \mbox{}\hfill\begin{@IEEEauthorhalign}
 }
-
-\author{\IEEEauthorblockN{Emerson A. de Lemmus II}
-\IEEEauthorblockA{\textit{Department of Computer Science} \\
-\textit{Sam Houston State University}\\
-Huntsville, United States \\
-exp035@shsu.edu}
-\and
+\makeatother
 
 
-\IEEEauthorblockN{Brendan P. McAntosh}
-\IEEEauthorblockA{\textit{Department of Computer Science} \\
-\textit{Sam Houston State University}\\
-Huntsville, Texas \\
-bpm007@shsu.edu}
-\and 
-
-\IEEEauthorblockN{ABM Rezbaul Islam}
-\IEEEauthorblockA{\textit{Department of Computer Science} \\
-\textit{Sam Houston State University}\\
-Huntsville, United States \\
-ari014@shsu.edu}
-\and
-\IEEEauthorblockN{Kolby T. Stafford}
-\IEEEauthorblockA{\textit{Department of Computer Science} \\
-\textit{Sam Houston State University}\\
-Huntsville, United States\\
-kts015@shsu.edu}
+\author{
+\IEEEauthorblockN{Emerson A. de Lemmus,
+Brendan P. McAntosh, 
+ABM Rezbaul Islam Ph.D., and
+Kolby T. Stafford}
+\IEEEauthorblockA{Department of Computer Science,
+Sam Houston State University\\
+United States\\
+}}
 
 
-}
 
 \maketitle
 
 \begin{abstract}
-Cotton is a significant crop in Texas, producing about one-third of the cotton in the United States. Cotton diseases lead to considerable losses in production and revenue. In this paper, we propose a proof-of-concept mobile application that uses two transfer learning models- MobileNetV3 and NasNet/mobile to detect cotton plant diseases. The system solves a four-classification problem to identify the health status of cotton plants or leaves. By utilizing transfer learning and TensorFlow Lite, we trained MobileNetV3 and NASNet/mobile models with publicly available data. We repurposed a TensorFlow sample iOS template as the baseline for this system. Additionally, we compared the performances of MobileNetV3 and NASNet Mobile neural networks. Our approach has shown promising results and could be further developed for practical use.
+Cotton, a crucial crop in Texas, accounting for a third of US production, often suffers significant losses due to diseases. This paper introduces a proof-of-concept mobile application employing MobileNetV3 and NASNetMobile transfer learning models to detect cotton plant diseases. The system addresses a four-class problem, identifying the health status of cotton plants or leaves. Using transfer learning and TensorFlow, these models were trained on public data, and an iOS app served as the system's deployment vehicle. We also evaluated the performance of the two state-of-the-art, unused in this context, neural networks - MobileNetV3 and NASNetMobile. Our methodology, demonstrating a promising potential for practical applications, achieved overall accuracies of 97.7\% for NASNetMobile and 96.7\% for MobileNetV3.
 \end{abstract}
 
 \begin{IEEEkeywords}
- Cotton Disease, Transfer Learning, MobileNetV3, NASNet mobile, Realtime detection, Mobile App
+ Cotton Disease, Transfer Learning, MobileNetV3, NASNetMobile, Real-time detection, Mobile Application
 \end{IEEEkeywords}
 
 \section{Introduction}
-According to the National Agriculture Statistics Service (NASS) of the United States Department of Agriculture (USDA), Texas produced 6.32 million 480-pound bales of cotton in 2019, making it the top cotton-producing state in the country, accounting for approximately 33\% of the nation's total cotton production \cite{ USDA-NASS}. However, cotton, like many cash crops, is vulnerable to various diseases, with 80\% to 90\% of cotton diseases, such as fungi and foliar leaf spots, manifesting on the cotton leaves  \cite{Gulhane-Gurjar}.  This indicates a need for an accurate and affordable machine vision system to detect these diseases early, which is crucial for cotton growth and yield. While cotton diseases can be identified manually, the process is often time-consuming and labor-intensive. Therefore, automating disease detection can help agricultural experts improve efficiency and ensure unambiguous disease verification.
+According to the USDA's National Agriculture Statistics Service (NASS), Texas produced 6.32 million 480-pound bales of cotton in 2019, making it the top cotton-producing state in the country, accounting for approximately 33\% of the nation's total cotton production \cite{ USDA-NASS}. However, cotton is susceptible to various diseases, with 80-90\% of them, such as fungi and foliar leaf spots, manifesting on the cotton leaves \cite{Gulhane-Gurjar}. There is a demand for an accurate, affordable machine vision system to enable disease detection, which is crucial for optimal cotton growth and yield. Manual disease identification is time-consuming and labor-intensive; automating the process can enhance efficiency and provide clear disease verification for agricultural experts.
 
-\par The deep learning (DL) revolution has revolutionized the AI industry in recent years. Since the 2012 deep learning victory over traditional machine learning algorithms at the ImageNet Large Scale Visual Recognition Challenge (ILSVRC), DL has emerged as the most precise solution for image recognition  \cite{Ashqar-Naser}\cite{Gehlot-Saini}. Convolutional Neural Networks (CNNs) are one of the best techniques for identifying objects and classifying images \cite{Sarangdhar-Pawar}.CNNs are composed of multiple layers of artificial neurons, and each layer is responsible for detecting different features in the image. The first layer might detect edges, the second layer might detect shapes, and so on. The final layer of the CNN outputs a probability distribution over the possible classes of the image.
+The deep learning (DL) revolution has significantly impacted the AI industry in recent years. Since its 2012 victory over traditional machine learning algorithms in the ImageNet Large Scale Visual Recognition Challenge (ILSVRC), DL has become the leading solution for image recognition \cite{Ashqar-Naser}\cite{Gehlot-Saini}. Convolutional Neural Networks (CNNs) excel in object identification and image classification \cite{Sarangdhar-Pawar}. Composed of multiple layers of artificial neurons, each layer in a CNN is responsible for detecting different image features, such as edges and shapes. The final layer outputs a probability distribution over the potential image classes.
 
-One popular approach in DL is to use pre-trained CNNs as a starting point for computer vision tasks \cite{Brownlee}. This approach, called transfer learning, is simpler than building a CNN from scratch. Transfer learning is a machine learning technique that involves leveraging pre-existing knowledge from one task to another, rather than starting from scratch. It has been shown to be an effective approach to overcoming the limitations of data scarcity and computational resources in many applications, including computer vision, natural language processing, and speech recognition. Moreover, a CNN model is fed thousands of high-quality images to retrain it to identify and classify new objects. This paper explores the application of transfer learning as a resource-effective method of creating accurate classification models to provide critical plant health information to agricultural experts. Data have demonstrated that transfer learning has effectively detected diseases in various crop types   \cite{Disease Detection} \cite{Disease Diagnosing}.\newline
+Transfer learning, a popular approach in deep learning, leverages pre-trained CNNs for computer vision tasks instead of building a model from scratch \cite{Brownlee}. This technique reuses knowledge from one task for another, effectively addressing data scarcity and computational resource limitations in various applications, including computer vision, natural language processing, and speech recognition. By retraining a CNN model with thousands of high-quality images, it can identify and classify new objects. This paper investigates the use of transfer learning as a resource-efficient method to create accurate classification models for providing essential plant health information to agricultural experts, as it has proven effective in detecting diseases in various crops \cite{Disease Detection} \cite{Disease Diagnosing}.
 
-\par This paper adopts a transfer learning approach to present a proof-of-concept for detecting diseased cotton plants and leaves. The visual data input is provided through a mobile app, which classifies the foliage as diseased or non-diseased using a trained MobileNetV3 model. The labeled output instantly informs the user if their cotton plant or leaf is diseased. This study presents a four-classifier problem, where healthy cotton leaf, healthy cotton plant, diseased cotton leaf, and diseased cotton plant are used as labels for a given input. Publicly available data provided by \cite{Kaggle} is used to train the MobileNetV3-Small and NASNet mobile models, which is more appropriate for a mobile environment. TensorFlow Lite transfers the retrained models to a mobile environment. This system aims to provide an accessible approach and simple implementation of transfer learning for agricultural developments.
+This paper demonstrates a proof-of-concept system for detecting diseased cotton plants and leaves using transfer learning with two state-of-the-art models which have not been used in this problem space before. A performance comparison is made by retraining the weights of two popular mobile device models, MobileNetV3 (2019) and NASNetMobile (2018) \cite{WandB}. During this study in Spring 2019, both models were state-of-the-art, had similar performances, and are optimized for mobile/edge devices. Importantly, they are models not previously used in edge devices for foliage disease classification. A mobile app serves as the visual data input, classifying foliage as diseased or non-diseased with a trained MobileNetV3 model, instantly informing users of the plant's health. The study employs a four-classifier problem, with labels for healthy and diseased cotton leaves and plants. Publicly available data \cite{Kaggle} is used to train the MobileNetV3-Small and NASNetMobile models, optimized for mobile environments. TensorFlow Lite transfers the retrained models to mobile devices, offering an accessible and straightforward implementation of transfer learning for agricultural advancements.
 
-\section{RELATED   WORKS}
+\section{RELATED WORKS}
 
-Several studies have explored the use of deep learning techniques for plant disease detection and classification. For example, Singh et al \cite{Singh-etal} used a CNN-based approach to detect rice diseases with an accuracy of 96.9\%. Similarly, Mohanty et al \cite{Mohanty-etal} developed a deep learning model for early detection of cassava diseases with an accuracy of 98.3\%. In the context of cotton disease detection, Bhoi \cite{Bhoi} developed a CNN-based system that achieved an accuracy of 91.4\% in identifying diseased cotton leaves. Additionally, Dey et al.\cite{Dey-etal} proposed a system for cotton disease classification that used a deep belief network (DBN) approach with an accuracy of 90\%. Other studies have focused on transfer learning as an effective approach for plant disease detection. For instance, Kazemi et al\cite{Kazemi-etal} applied transfer learning to classify tomato leaf diseases with an accuracy of 98.3\%. Likewise, Sharma et al.\cite{Sharma-etal} transfer learning to classify potato diseases with an accuracy of 97.5\%. In the context of mobile applications, Siddique et al.\cite{Siddique-etal}developed a mobile app for wheat disease diagnosis that used a transfer learning-based approach with an accuracy of 97.5\%. Similarly, Uddin et al.\cite {Uddin-etal} proposed a mobile app for mango disease detection that achieved an accuracy of 91.8\% using a transfer learning approach. 
-Overall, these studies demonstrate the effectiveness of deep learning and transfer learning techniques for plant disease detection and classification. Moreover, the use of mobile applications can enhance the accessibility and practicality of these techniques for farmers and agricultural experts.
+Numerous studies demonstrate the effectiveness of deep learning in plant disease detection and classification. For instance, Singh et al. \cite{Singh-etal} and Mohanty et al. \cite{Mohanty-etal} achieved detection accuracies of 96.9\% and 98.3\% for rice and cassava diseases, respectively, using CNNs. In cotton disease detection, both Bhoi \cite{Bhoi} and Dey et al.\cite{Dey-etal} utilized deep learning, yielding accuracies above 90\%. Additionally, transfer learning has proven successful in disease detection, with Kazemi et al\cite{Kazemi-etal} and Sharma et al.\cite{Sharma-etal} achieving over 97\% accuracy for tomato and potato diseases, respectively. Mobile applications have also been effectively implemented. For instance, Siddique et al.\cite{Siddique-etal} and Uddin et al.\cite{Uddin-etal} developed mobile apps for wheat and mango disease detection using transfer learning, both achieving over 90\% accuracy. These studies underscore the utility of deep learning, transfer learning, and mobile applications in accessible, practical disease detection for agriculture.
 
+\section{Methodology}
 
-\begin{comment}
-and the interface to allow users to use images in their camera roll.
-\end{comment}. With agricultural experts working in remote areas, we chose to provide a very narrow focus on interface and functionality. Normal use of this application was planned to take as little time as possible, allowing for immediate response times if potential crop issues are discovered. 
-\begin{comment} However, since field conditions are rarely consistent or ideal for smartphone usage, the decision was made to allow users to classify crop conditions for existing photos. This allows users who may have difficulty viewing their devices screen an opportunity to seek better viewing conditions at any time. 
-\end{comment}
+This study aims to create an accessible, efficient, and real-time mobile application for cotton disease detection, utilizing transfer learning. The application uses the mobile phone camera to provide instantaneous health classification of cotton plants or leaves, functioning even in areas with limited internet connectivity. This approach creates a cost-effective, precise, and resource-efficient system. In contrast to traditional disease detection methods, which can be labor-intensive, expensive, and slow, our mobile application can operate offline, providing immediate classification and offering a practical and innovative solution for cotton disease detection. Using MobileNetV3 and NASNetMobile, two previously unused state-of-the-art CNN architectures in foliage disease identification, this study also offers a performance baseline for studies using future iterations of MobileNet and NASNet architectures. 
 
-\section{PROPOSED METHODS}
-The research aims to develop a mobile application that utilizes transfer learning to detect cotton diseases accurately, efficiently, and in real-time. The mobile app is designed to offer a user-friendly and accessible platform to identify diseased foliage, even in areas with limited or no internet connectivity. The application employs a mobile phone camera to provide the real-time classification of the health status of a cotton plant or leaf.
-To achieve this objective, we employed transfer learning, which is a deep learning technique that leverages pre-existing neural network models to identify and classify new objects. By utilizing transfer learning, we developed a cost-effective and efficient system that can detect cotton diseases with high precision, while minimizing the need for extensive data and computational resources. Overall, our research presents a novel and practical solution for detecting cotton diseases using a mobile app. The system's ability to operate offline and provide real-time classification offers significant advantages over existing disease detection methods, which are often laborious and time-consuming.
+\subsection{Transfer Learning}
 
-\subsection{Transfer Learning Method}
-In this study, we compare the performance of two Convolutional Neural Network (CNN) architectures in detecting the health status of cotton plants or leaves. Specifically, we implement the MobileNetV3 models, which is one of the prominent models optimized for mobile environments, and compare their efficiency with NASNet mobile. NASNet mobile is another lightweight CNN that is designed for embedded systems and built upon the MobileNetV2 architecture [10]. This choice of architecture serves as an appropriate point of comparison with MobileNetV3. By evaluating the performance of these models on the same dataset, we aim to provide insights into the most suitable CNN architecture for detecting cotton diseases using a mobile app. It is noteworthy here is, this research is only focused on machine learning algorithms that are suitable for running on mobile devices. 
+Transfer learning, a machine learning technique, leverages a pre-trained model—often trained on a large dataset like ImageNet—to fine-tune the performance for a specific task \cite{Shu}. This approach capitalizes on the pre-trained model's generalized weights, facilitating swift prototyping of architectures while being cost-effective. For instance, training a model on ImageNet, a 14-million-image dataset \cite{Reynolds}, is prohibitively expensive for most researchers. In 2017, the cost per training iteration was estimated at \$1112.64, excluding upfront hardware costs \cite{genuineimpact}.
 
-\subsection{Dataset}
-In this research, we utilized a publicly available dataset consisting of a total of 2,310 labeled images depicting varying cotton plants and cotton leaves. The dataset was categorized into four groups: healthy cotton leaves, diseased cotton leaves, healthy cotton plants, and diseased cotton plants. The dataset comprised 2,204 images designated for training the model and 106 images allocated for testing. The images were in JPG format and RGB color space, with an input size of 224 x 224 pixels. The dataset was split into an 80/20 ratio, with 80\% of the images utilized for training and the remaining 20\% reserved for validation. During the training phase, the model was trained to recognize specific features and attributes of cotton foliage, while the validation set was employed to evaluate the model's performance. By utilizing this standardized dataset, we aimed to develop an accurate and efficient classification model for identifying and detecting cotton diseases. The use of standardized data allowed us to compare the performance of different models and assess their suitability for practical use in the agricultural industry.
+As depicted in \emph{Fig. \ref{Transfer Learning}}, transfer learning employs a pre-trained model, often sourced from PyTorch or Tensorflow, while 'freezing' the depthwise and bottleneck layers, where the majority of pre-trained weights reside. Preserving these weights is beneficial due to their capacity to discern a variety of features. However, as these weights may not recognize novel targets such as diseased foliage, fine-tuning the adaptive average pooling, fully connected, and output layers is essential. This process equips a model to classify diseased foliage, despite its lack of prior training on such data.
 
-\subsection{Data pre-processing}
-Data pre-processing is a fundamental technique in data mining that aims to transform raw data into a useful format by suppressing unwanted distortions and enhancing image features that are critical for further processing. In this study, a uniform pre-processing methodology was adopted across all models tested. The images were initially read and resized to 224 x 224 pixels. Data augmentation, a technique used to augment the available data by creating slightly modified copies of existing data, was then performed. Specifically, the images were subjected to rotational and horizontal-vertical flipping, changes in width, height, shear, zoom, and pixel values to enhance the robustness of the models. By adopting a standardized pre-processing approach, we aimed to minimize potential biases and increase the comparability of our results as shown in \emph{Fig. \ref{Augment}.}
-
-
-\begin{figure}[b]
-\centering
-\includegraphics[height=2.5cm, width=\linewidth]{Images/Data_Augmentation2_LI (2).pdf}
-\caption{Data augmentation example on an image.}
-\label{Augment}
+\begin{figure}[h]
+\centerline{\includegraphics[height=6.5cm, width=1\linewidth]{Images/MobileNet_Small.png}}
+\caption{Visualization of transfer learning implementation in a CNN inspired by MobileNetV3. The diagram highlights the preservation of convolutional layers to utilize their wide feature discernment ability, with emphasis on fine-tuning the pooling and output layers for the specific task of cotton foliage disease identification.}
+\label{Transfer Learning}
 \end{figure}
 
+\subsection{Dataset}
+In this study, we utilized a dataset sourced from Kaggle \cite{Kaggle} that is publicly available. It comprises 2,310 labeled images of cotton plants and leaves. These images are classified into four categories: healthy cotton leaves, diseased cotton leaves, healthy cotton plants, and diseased cotton plants as displayed in \emph{Fig. \ref{CottonImages}}. The dataset includes 1764 training, 440 validation, and 106 testing images. All images are in JPG format and RGB color space, each with a resolution of 224 x 224 pixels. These images were collected under similar conditions including lighting, angles, and stages of disease progression. In future works, this effort will benefit from having an enriched dataset that accounts for multiple disease categories and includes enriched conditions. We divided the training dataset into an 80:20 ratio for training and validation, respectively. Both MobileNetV3 and NASNetMobile were trained to identify specific features indicative of cotton foliage health, with their performance evaluated against the validation set. Our objective is to construct an accurate and efficient prototype application for cotton disease detection using transfer learning. Using this dataset, we can compare the baseline performance of mobile device models and assess their applicability in the agricultural sector, specifically for real-time disease detection in cotton plants.
+
+\begin{figure}[h]
+\centerline{\includegraphics[height=8.5cm, width=.9\linewidth]{Images/cotton images.drawio.png}}
+\caption{Sample images for each class featured in the dataset. Image credit: B. Janmejay.}
+\label{CottonImages}
+\end{figure}
+
+
+\subsection{Data pre-processing}
+
+In this study, we meticulously adhered to a standardized data pre-processing protocol, promoting data compatibility across all models under examination. This essential step in data mining refines raw data into an analyzable format, curbing unnecessary distortions and accentuating key image features. Initially, we resized images to a consistent 224 x 224 pixel dimension, aligning with the input requirements of both MobileNetV3 and NASNetMobile, ensuring no feature loss or artifact generation. Subsequently, we implemented data augmentation, a strategy that amplifies the dataset by generating slightly altered copies of existing images, thereby bolstering the models' resilience. This approach entailed image transformations such as rotation, horizontal-vertical flipping, and alterations in width, height, shear, zoom, and pixel values, depicted in \emph{Fig. \ref{Augment}}. Preserving realistic scenarios, we retained the original RGB color space, opting against grayscale conversion. Each training image was augmented to produce five unique images, thereby expanding the training dataset from 1763 to 8816 images. Contrarily, the validation subset, comprising 440 images, remained untouched to maintain the validity of our results, as data augmentation may inadvertently introduce biases and artifacts. Our adherence to a standardized pre-processing approach minimized potential biases and ensured comparability of our results. This structured methodology is integral to our goal of developing a reliable and valid classification model for cotton disease detection.
+ 
+\begin{figure*}[ht]
+\centering
+\includegraphics[height=3.2cm, width=1\linewidth]{Images/Data_Augmentation2_LI (2).pdf}
+\caption{Example of data augmentation techniques applied to an image: a raw image undergoes various transformations, such as rotation, scaling, flipping, and shearing, to increase the diversity of the training dataset and improve model generalization.}
+\label{Augment}
+\end{figure*}
 
 
 \subsection{Defining Convolutional Neural Networks}
 
-Convolutional Neural Networks (CNNs) are an effective method for image classification, consisting of multiple layers that sequentially process input images and output a classifier label. The first layer accepts the input image and applies multiple convolution operations to create a feature map matrix. This feature map is then resized, leading to a reduction in dimensions as the image is processed through each layer. The output of one layer serves as the input for the next, with this process continuing until all layers have processed the image. Finally, the fully connected layer condenses all features into a vector and feeds them into the final softmax layer, which outputs the classifier labels along with their probabilities.
+Convolutional Neural Networks (CNNs), comprising sequential layers for processing input images, are a potent tool for image classification. The process begins with the first layer applying multiple convolution operations to the input image, generating a feature map matrix. This matrix undergoes dimension reduction through resizing as it progresses through the layers. The output from one layer serves as input to the subsequent layer, culminating in a fully connected layer that compacts all features into a vector for the final softmax layer, which in turn outputs the classifier labels and their associated probabilities.
 
-The convolution operation performed in the initial layers of the CNN can be mathematically represented as follows:
+Mathematically, the convolution operation performed in CNNs' initial layers can be expressed as:
 
 \begin{equation}
 Z(i,j) = (I * K)(i,j) = \sum_m \sum_n I(m,n) K(i-m,j-n)
 \end{equation}
 
-where $I$ represents the input image, $K$ is the filter kernel, and $Z(i,j)$ is the output feature map matrix. This operation applies the filter to each element of the input image, and the resulting values are summed to generate each element of the output matrix.
+Here, $I$ is the input image, $K$ the filter kernel, and $Z(i,j)$ the output feature map matrix. The filter is applied to each element of the input image, with the resultant values summed to form each output matrix element.
 
-The output of each layer is computed as follows:
+Each layer's output is computed via:
 
 \begin{equation}
 A^{(l)} = g(Z^{(l)}) = g(W^{(l)}A^{(l-1)} + b^{(l)})
 \end{equation}
 
-where $W^{(l)}$ and $b^{(l)}$ are the weights and biases of the $l$-th layer, $A^{(l-1)}$ is the input feature map, $g$ is the activation function, and $Z^{(l)}$ is the weighted sum of the input features. This process is repeated for all layers until the final softmax layer, where the classifier labels are computed as follows:
+In this equation, $W^{(l)}$ and $b^{(l)}$ denote the weights and biases of the $l$-th layer respectively, $A^{(l-1)}$ is the input feature map, $g$ represents the activation function, and $Z^{(l)}$ is the weighted sum of input features.
+
+The final softmax layer computes classifier labels as follows:
 
 \begin{equation}
 P(y=j|x) = \frac{e^{z_j}}{\sum_{k=1}^K e^{z_k}}
 \end{equation}
 
-where $P(y=j|x)$ is the probability of the image being classified as label $j$, $z_j$ is the weighted sum of the features for label $j$, and $K$ is the total number of labels.  \cite{Smeda}. 
-
-\begin{figure}[h]
-\centerline{\includegraphics[height=5cm, width = 1\linewidth]{Images/mobile_net3.png}}
-\caption{Architecture of MobileNetV3 \cite{m}.}
-\label{VGG16}
-\end{figure}
+Here, $P(y=j|x)$ is the probability of classifying the image as label $j$, $z_j$ refers to the weighted sum of features for label $j$, and $K$ is the total number of labels \cite{Smeda}.
 
 
 \subsection{MobileNetV3}
-The selected architecture for this project is MobileNetV3, a recent advancement in mobile convolutional neural networks (CNNs) that was released in Q2 of 2019. Developed by Google specifically for mobile and embedded vision applications, MobileNetV3 utilizes depth-wise separable convolutions, resulting in a significant reduction in computation compared to conventional models. The overall process can be visualized as shown in Figure\ref{VGG16} . Specifically, this model reduces computation processes by a factor of nine [12]. MobileNetV3 is a lightweight neural network that consists of 27 layers, including a total of 219 convolutional layers. The model has an input size of 224 x 224 x 3 and uses depth-wise separable convolution, which reduces the computational requirements by a factor of 9 compared to standard models. It also incorporates a combination of linear bottlenecks and inverted residuals to improve the network's efficiency and accuracy. Additionally, MobileNetV3 has been optimized for mobile devices with limited computational resources, making it ideal for our project's mobile application. \cite{Howard-Zhu}.
 
-\begin{figure}[h]
-\centerline{\includegraphics[height=5cm, width = 1\linewidth]{Images/Screen Shot 2021-05-03 at 3.35.10 PM.pdf}}
-\caption{MobileNetV3 Parameters \cite{Howard-Sandler}}
-\label{MobV3 Arch}
-\end{figure}
+The first model chosen for this study is MobileNetV3 - Large, an advanced mobile convolutional neural network (CNN) introduced by Google in Q2 2019, specifically designed for mobile and embedded vision applications \cite{Howard-Sandler}. MobileNetV3 leverages depth-wise separable convolutions to significantly reduce computation by a factor of nine, compared to traditional models \cite{Yanhui}. paperswithcode summarizes the MobileNetV3 Large and Small models \cite{paperswithcode}. The large version of the model was chosen for this study as it contains more trainable parameters, has a higher baseline accuracy than the smaller model, and closely resembles NASNetMobile in terms of Parameters, FLOPS, and File Size. \emph{Table \ref{table:MobileNetV3}} and \emph{Table \ref{table:MobileNetV3-Architecture}} summarize MobileNetV3 parameters and architecture concisely \cite{paperswithcode}. With its optimization for devices possessing limited computational resources, this architecture is an ideal choice for deploying image models for mobile applications \cite{Howard-Zhu}.
+
+\begin{table}[ht]
+\centering
+\caption{MobileNetV3 - Parameters}
+%\begin{tabular}{l|l}
+\begin{tabularx}{1\columnwidth}{X|>{\centering\arraybackslash}X}
+\hline
+\textbf{Parameter} & \textbf{Value} \\
+\hline
+Parameters & 5 Million \\
+FLOPS & 225 Million \\
+File Size & 21.11 MB \\
+Training Data & ImageNet \\
+Training Resources & 8x NVIDIA V100 GPUs \\
+\hline
+\end{tabularx}
+\label{table:MobileNetV3}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{MobileNetV3 - Architecture}
+\begin{tabularx}{\columnwidth}{>{\centering\arraybackslash}X}
+\hline
+\begin{tabular}{c}
+1x1 Convolution \\
+Batch Normalization \\
+Convolution \\
+Dense Connections \\
+Depthwise Separable Convolution \\
+Dropout \\
+Global Average Pooling \\
+Hard Swish \\
+Inverted Residual Block \\
+Residual Connection \\
+ReLU \\
+Softmax \\
+Squeeze-and-Excitation Block \\
+\end{tabular} \\
+\hline
+\end{tabularx}
+\label{table:MobileNetV3-Architecture}
+\end{table}
 
 
 
-\subsection{NASNet Mobile}
-In this study, we conducted a comparative evaluation of the MobileNetV3 and NASNet mobile CNN architectures for cotton disease detection. NASNet Mobile is a neural architecture search algorithm developed by Google Brain for the 2018 ImageNet Competition, which uses reinforcement learning to determine the optimal combination of various hyperparameters. The architecture of NASNet Mobile is based on a series of "normal" and "reduction" cells, with each cell comprising multiple blocks that perform a set of operations, including convolution, batch normalization, and activation. The output of each block is computed as:
+\subsection{NASNetMobile}
+The second model chosen for this study is NASNetMobile an advanced mobile CNN also introduced by Google in 2018. NASNetMobile is essentially a neural architecture search algorithm developed by Google Brain for the 2018 ImageNet Competition, which uses reinforcement learning to determine the optimal combination of various hyperparameters. The architecture of NASNetMobile is based on a series of "normal" and "reduction" cells, with each cell comprising multiple blocks that perform a set of operations, including convolution, batch normalization, and activation. The output of each block is computed as:
 
 \begin{equation}
 H_{l,k} = F_{l,k}(H_{l-1,1},H_{l-1,2},...,H_{l-1,n})
 \end{equation}
 
-where $F_{l,k}$ is the function applied by the $k$-th block in the $l$-th cell, $H_{l-1,1},H_{l-1,2},...,H_{l-1,n}$ are the inputs to the $k$-th block from the previous cell, and $H_{l,k}$ is the output of the $k$-th block in the $l$-th cell. The final output of the NASNet Mobile architecture is a softmax layer, which computes the probabilities of each class label given the input image.
+where $F_{l,k}$ is the function applied by the $k$-th block in the $l$-th cell, $H_{l-1,1},H_{l-1,2},...,H_{l-1,n}$ are the inputs to the $k$-th block from the previous cell, and $H_{l,k}$ is the output of the $k$-th block in the $l$-th cell. The final output of the NASNetMobile architecture is a softmax layer, which computes the probabilities of each class label given the input image.
 
-NASNet Mobile has been designed for use in embedded systems with limited computational resources. The architecture achieves state-of-the-art performance on the ImageNet dataset and has been shown to generalize well to other datasets. Our evaluation of NASNet Mobile for cotton disease detection provides insights into the effectiveness of this architecture for crop monitoring applications.
-\begin{figure}[h]
-\centerline{\includegraphics[height=5cm, width = 1\linewidth]{Images/Capture.pdf}}
-\caption{NASNet mobile Parameters \cite{Zoph-Vasudevan}. }
-\label{Nas Arch}
-\end{figure}
+NASNetMobile has been designed for use in embedded systems with limited computational resources. The architecture achieves state-of-the-art performance on the ImageNet dataset. Our evaluation of NASNetMobile for cotton disease detection provides insights into the effectiveness of this architecture for crop monitoring applications. \emph{Table \ref{table:NASNetMobile}} \emph{Table \ref{table:NASNetMobile-Architecture}} summarize NASNetMobile parameters and architecture concisely \cite{paperswithcodenas}.
+
+\begin{table}[ht]
+\centering
+\caption{NASNetMobile - Parameters}
+%\begin{tabular}{l|l}
+\begin{tabularx}{1\columnwidth}{X|>{\centering\arraybackslash}X}
+\hline
+\textbf{Parameter} & \textbf{Value} \\
+\hline
+Parameters & 4 Million \\
+FLOPS & 325 Million \\
+File Size & 16.92 MB \\
+Training Data & ImageNet \\
+Training Resources & 8x NVIDIA V100 GPUs \\
+\hline
+\end{tabularx}
+\label{table:NASNetMobile}
+\end{table}
+
+\begin{table}[ht]
+\centering
+\caption{NASNetMobile - Architecture}
+\begin{tabularx}{\columnwidth}{>{\centering\arraybackslash}X}
+\hline
+\begin{tabular}{c}
+1x1 Convolution \\
+Batch Normalization \\
+Convolution \\
+Depthwise Separable Convolution \\
+Dropout \\
+Global Average Pooling \\
+Inverted Residual Block \\
+Residual Connection \\
+ReLU \\
+Max Pooling \\
+Softmax \\
+Squeeze-and-Excitation Block \\
+\end{tabular} \\
+\hline
+\end{tabularx}
+\label{table:NASNetMobile-Architecture}
+\end{table}
+
+%\begin{table}[ht]
+%\centering
+%\caption{NASNetMobile - Architecture}
+%\begin{tabularx}{\columnwidth}{>{\centering\arraybackslash}X}
+%\hline
+%1x1 Convolution \\
+%Batch Normalization \\
+%Convolution \\
+%Depthwise Separable Convolution \\
+%Dropout \\
+%Global Average Pooling \\
+%Inverted Residual Block \\
+%Residual Connection \\
+%ReLU \\
+%Max Pooling \\
+%Softmax \\
+%Squeeze-and-Excitation Block \\
+%\hline
+%\end{tabularx}
+%\label{table:NASNetMobile-Architecture}
+%\end{table}
 
 
-\begin{comment}
 
 
-\subsection{VGG16}
-Visual Geometry Group (VGG) at the Department of Engineering Science, University of Oxford proposed the VGG16 CNN model for the ICLR 2015 conference \cite{Simonyan-Zisserman}. VGG16 consists of 13 convolution layers and 3 fully connected layers. This system builds upon the famous AlexNet by adding a greater number of convolution layers and using smaller filters. This model is extremely popular and serves as a benchmark for comparison to non-mobile models. With a 92.7\% accuracy in ImageNet using over 1.2 million images and 1000 categories, VGG16 is highly popular for non-mobile applications \cite{Neurohive}. Shown in \emph{Fig. 2.} VGG16 architecture is very unambiguous and provides state-of-the-art results. Using fully connected layers and having softmax layers was a milestone improvement provided by the VGG team. Currently, there is a model known as VGG19, which adds 3 more convolutional layers to VGG16. Due to this increase in layers, VGG19 slightly outperforms VGG16 however it is larger and requests more memory\cite{Shu}. For the purposes of this comparison, this paper omits VGG19.
-\begin{figure}[h]
-\centerline{\includegraphics[height=9cm, width = .9\linewidth]{Images/Capture1.pdf}}
-\caption{Visualises the architecture of CNN model VGG16 \cite{Gehlot-Saini}. }
-\end{figure}
 
-\end{comment}
 
 \section{Experimental Results}
-To assess the efficacy of the two models, we utilized several metrics for evaluating their performance. These metrics include accuracy, recall, precision, and F1-score, which serve as performance indicators. A confusion matrix was also illustrated in table\ref{Moble Confusion Matrix}.
+
+Performance evaluation of both models relied on metrics such as accuracy, recall, precision, and F1-score, as shown in \emph{Table \ref{table:MNCM}}, \emph{Table \ref{table:MNPerformance}}, \emph{Table \ref{table:NNMCM}}, and \emph{Table \ref{table:NNMPerformance}}. Despite uniform data pre-processing and a 20-epoch training phase, the Google Colab-free environment imposed epoch limitations due to its slower processing speed compared to onsite hardware.
 
 
-To demonstrate the simplicity and accessibility of the project, TensorFlow's sample classifier project was used as a baseline. The results of this comparison were depicted in \emph{Fig. \ref{Moble Perform}. and Fig. \ref{Nas Performance}.}. Both models were trained with 20 epochs and identical pre-processing of data. 
-
-\subsection{Results MobileNetV3}
-Based on the experimental results, the training loss and validation loss were observed to be 72.90\% and 75.92\%, respectively, after 20 epochs of training. The proposed model achieved the highest validation accuracy of 98.66\%, whereas the highest training accuracy achieved was 99.29\%. These findings indicate the effectiveness of the proposed model in accurately classifying cotton foliage into the four categories of healthy cotton leaves, diseased cotton leaves, healthy cotton plants, and diseased cotton plants. The plots in \emph{Fig. \ref{Nas Performance}.} visualize these statistics. The results were tabulated in  \emph{Table. \ref{Moble Class Scores}.}
-
-
-
-\begin{figure}[h]
-\centerline{\includegraphics[height=6.5cm, width = 1\linewidth]{Images/Screen_Shot_2021-05-04_at_5.27.06_PM.pdf}}
-\caption{MobileNetV3 performance on TensorFlow. \centering{\newline Top: Plots of training and validation loss against epochs. \newline Bottom: Plots of accuracy and validation accuracy against epochs.}}
-\label{Moble Perform}
-\end{figure}
-
-It is noteworthy that, Convolutional Neural Networks (CNNs) are widely used for image classification, but the relationship between training and validation loss can be complex. If the validation loss is much higher than the training loss, the model is said to be overfitting, while if the training loss remains flat or decreases but the validation loss does not, the model is said to be underfitting. In this study, a "good fit" was observed, with training and validation loss decreasing to a point of stability with a minimal gap between the two final loss values. The training accuracy and validation accuracy are determined by the 80/20 split of the training data, with the training accuracy measuring the model's performance on the 80\% of the dataset used for training, and the validation accuracy measuring performance on the remaining 20\% of the dataset. These results indicate the suitability of the proposed model for accurately identifying and detecting cotton diseases. %\cite{Progrev, Brownlee2, Stackexchange}.
-
-In order to assess the accuracy and robustness of our system, a set of 106 testing images were meticulously selected and segregated from the training dataset. The purpose of these images was to evaluate the performance of the model against unseen and diverse data. The testing phase allowed us to gauge the generalization ability of the model, which is a key factor in real-world applications. The results obtained from the testing phase provide a reliable estimation of the overall accuracy and reliability of the proposed system and demonstrate its effectiveness in identifying and detecting cotton diseases with a high degree of confidence. From this data can derive a confusion matrix \emph{Table I} 
+In \emph{Table \ref{table:MNParam}} and \emph{Table \ref{table:NNMParam}} are the hyperparameters for each model. 
 
 \begin{table}[htbp]
     \centering
-    \begin{tabularx}{0.49\textwidth } { 
-        | >{\centering\arraybackslash}X 
-        | >{\centering\arraybackslash}X 
-        | >{\centering\arraybackslash}X 
-        | >{\centering\arraybackslash}X 
-        | >{\centering\arraybackslash}X |
-        }
-        \hline
-         \scriptsize Class (\# Test Data) & \scriptsize Fresh Cotton Leaf & \scriptsize Fresh Cotton Plant & \scriptsize Diseased Cotton Leaf & \scriptsize Diseased Cotton Plant \\
-         \hline 
-         \scriptsize Fresh Cotton Leaf (26) & 24 & 0 & 2 & 0 \\
-         \hline
-         \scriptsize Fresh Cotton Plant (27) & 0 & 22 & 0 & 5 \\
-         \hline
-         \scriptsize Diseased Cotton Leaf (25) & 0 & 0 & 24 & 1 \\
-         \hline
-         \scriptsize Diseased Cotton Plant (28) & 0 & 0 & 0 & 28 \\
-         \hline
-
-    \end{tabularx} 
-    \caption{MobileNetV3 Confusion Matrix.}
-    \label{Moble Confusion Matrix}
+    \caption{MobileNetV3 - Hyperparameters}
+    \begin{tabularx}{1\columnwidth}{X|>{\centering\arraybackslash}X}
+    \hline
+    \multicolumn{1}{c|}{\textbf{Parameter}} & \multicolumn{1}{c}{\textbf{Value}} \\
+    \hline
+    Learning Rate & 0.064 \\
+    Epochs & 20 \\
+    LR Gamma & 0.973 \\
+    Momentum & 0.9 \\
+    Batch Size & 128 \\
+    LR Step Size & 2 \\
+    Random Erase & 0.2 \\
+    Weight Decay & 0.00001 \\
+    \hline
+    \end{tabularx}
+    \label{table:MNParam}
 \end{table}
 
+\begin{table}[htbp]
+    \centering
+    \caption{NASNetMobile - Hyperparameters}
+    \begin{tabularx}{1\columnwidth}{X|>{\centering\arraybackslash}X}
+    \hline
+    \multicolumn{1}{c|}{\textbf{Parameter}} & \multicolumn{1}{c}{\textbf{Value}} \\
+    \hline
+    Learning Rate & 0.1 \\
+    Epochs & 20 \\
+    LR Gamma & 0.1 \\
+    Momentum & 0.9 \\
+    Batch Size & 32 \\
+    LR Step Size & 30 \\
+    Weight Decay & 0.0001 \\
+    \hline
+    \end{tabularx}
+    \label{table:NNMParam}
+\end{table}
 
+\subsection{Results -  MobileNetV3}
+
+Based on the experimental results, the training loss and validation loss were observed to be 72.90\% and 75.92\%, respectively, after 20 epochs of training. The best validation accuracy of 98.66\% and the best training accuracy was 99.29\%. These findings indicate the effectiveness of the proposed model in accurately classifying cotton foliage into the four categories of healthy cotton leaves, diseased cotton leaves, healthy cotton plants, and diseased cotton plants. The plots in \emph{Fig. \ref{MNStats}.} visualize these statistics. 
+
+\begin{figure}[h]
+\centerline{\includegraphics[height=10cm, width = .9\linewidth]{Images/Screen_Shot_2021-05-04_at_5.27.06_PM.pdf}}
+\caption{MobileNetV3 trainig performance over 20 epochs. \centering{\newline Top: Plots training and validation loss against epochs. \newline Bottom: Plots accuracy and validation accuracy against epochs.}}
+\label{MNStats}
+\end{figure}
+
+
+CNNS are prevalent in image classification, with the relationship between training and validation loss often intricate. A model overfits if the validation loss considerably exceeds the training loss, while it underfits if the training loss either plateaus or declines without a corresponding decrease in validation loss. This study observed an optimal fit, with both losses descending to a stable point with a minimal gap.
+
+For assessing system accuracy and robustness, 106 test images were deliberately isolated from the training dataset, providing diverse, unseen data for performance evaluation. The test phase allowed for an appraisal of the model's generalization ability, crucial for real-world applications. The resulting test data provided a reliable estimate of system accuracy and reliability, thereby demonstrating its efficacy in cotton disease detection. This data further facilitated the generation of a confusion matrix displayed in \emph{Table \ref{table:MNCM}}.
+
+\begin{table}[htbp]
+    \centering
+    \caption{MobileNetV3 - Confusion Matrix}
+    \label{table:MNCM}
+    \begin{tabularx}{0.49\textwidth }{ 
+        >{\centering\arraybackslash}X 
+        >{\centering\arraybackslash}X 
+        >{\centering\arraybackslash}X 
+        >{\centering\arraybackslash}X 
+        >{\centering\arraybackslash}X
+        }
+    \hline
+    \textbf{Class (images)} & \textbf{Fresh Leaf} & \textbf{Fresh Plant} & \textbf{Diseased Leaf} & \textbf{Diseased Plant} \\
+    \hline 
+    Fresh Leaf (26) & 24 & 0 & 2 & 0 \\
+    Fresh Plant (27) & 0 & 22 & 0 & 5 \\
+    Diseased Leaf (25) & 0 & 0 & 24 & 1 \\
+    Diseased Plant (28) & 0 & 0 & 0 & 28 \\
+    \hline
+    \end{tabularx} 
+\end{table}
 
 The overall accuracy of the proposed model is given by equation \ref{eq:oa}:
 \begin{equation}
@@ -250,127 +370,126 @@ Overall Accuracy = \frac{TP + TN}{TP+TN+FP+FN}
 
 where TP represents true positive, TN represents true negative, FP represents false positive, and FN represents false negative.\newline
 
-Our proposed MobileNetV3 model achieved high accuracy rates for each label, with accuracies of 97.5\% for fresh cotton leaves, 94.8\% for fresh cotton plants, 97.5\% for diseased cotton leaves, and 100\% for diseased cotton plants. The overall accuracy of the model was calculated to be 96.7\%, as determined by the confusion matrix analysis using the equation presented above. These results demonstrate the effectiveness of our model in accurately identifying and classifying the health status of cotton foliage. 
+
+Our trained MobileNetV3 model achieved high accuracy rates for each label; the overall accuracy of the model was 96.7\% These results demonstrate the effectiveness of our model in accurately identifying and classifying the health status of cotton foliage. Notably, the fine-tuned model performed the lowest when classifying fresh plants. The reason for this inconsistency is the visual similarity between a fresh cotton plant and a diseased cotton plant as demonstrated in \emph{Fig. \ref{Diseased_Fresh_Plant}}, it can be challenging to differentiate even with human vision.
 
 \begin{table}[htbp]
     \centering
-    \begin{tabularx}{0.49\textwidth } { 
-        | >{\centering\arraybackslash}X 
-        | >{\centering\arraybackslash}X 
-        | >{\centering\arraybackslash}X  
-        | >{\centering\arraybackslash}X |
+    \caption{MobileNetV3 - Performance Metrics}
+    \label{table:MNPerformance}
+    \begin{tabularx}{0.49\textwidth }{ 
+        >{\centering\arraybackslash}X 
+        >{\centering\arraybackslash}X 
+        >{\centering\arraybackslash}X 
+        >{\centering\arraybackslash}X 
+        >{\centering\arraybackslash}X
+        >{\centering\arraybackslash}X
         }
-        \hline
-         \scriptsize Class & \scriptsize Recall & \scriptsize Precision & \scriptsize F1 - Score \\
-         \hline 
-         \scriptsize Fresh Cotton Leaf & 0.923 & 1.000 & 0.960 \\
-         \hline
-         \scriptsize Fresh Cotton Plant & 1.000 & 0.815 & 0.898 \\
-         \hline
-         \scriptsize Diseased Cotton Leaf & 0.960 & 0.960 & 0.960 \\
-         \hline
-         \scriptsize Diseased Cotton Plant & 1.000 & 1.000 & 1.000 \\
-         \hline
-
+    \hline
+    \textbf{Class} & \textbf{Recall} & \textbf{Precision} & \textbf{F1-Score} & \textbf{Accuracy} \\
+    \hline 
+    Fresh Leaf & 0.923 & 1.000 & 0.960 & 97.5\% \\
+    Fresh Plant & 1.000 & 0.815 & 0.898 & 94.8\% \\
+    Diseased Leaf & 0.960 & 0.960 & 0.960 & 97.5\% \\
+    Diseased Plant & 1.000 & 1.000 & 1.000 & 100\% \\
+    \hline
     \end{tabularx} 
-    
-    \caption{\centering MobileNetV3 Recall, Precision, and F1-Score for each class.}
-    \label{Moble Class Scores}
 \end{table}
-
-In Table \ref{Moble Class Scores}, an outlier can be observed with low F1-score and precision for fresh cotton plants. This is primarily due to the model's limited support for RGB color values, resulting in normal plant attributes being incorrectly flagged as diseased.
-
-\subsection{Results NASNet Mobile}
-After training the model for 20 epochs, the resulting training loss was 75.48\%, while the validation loss was 77.41\%. The highest validation accuracy achieved was 98.77\%, and the highest training accuracy achieved was 99.83\%. The plots in figure\ref{Nas Performance} visualize these statistics. 
 
 \begin{figure}[h]
-\centerline{\includegraphics[height=6.5cm, width = 1\linewidth]{Images/Screen Shot 2021-05-10 at 4.36.35 PM.pdf}}
-\caption{NASNet Mobile performance on Tensorflow. \centering{\newline Top: Plots of training and validation loss against epochs. \newline Bottom: Plots of accuracy and validation accuracy against epochs.}}
-\label{Nas Performance}
+\centerline{\includegraphics[height=5cm, width=1\linewidth]{Images/Disease_FreshComparison.drawio.png}}
+\caption{Here are two randomly selected images from the Kaggle dataset, illustrating the occasional visual similarity between different classes. It is difficult to distinguish the difference - even to the untrained human eye. This attribute contributes to the lower F1-Score (0.898) and Accuracy (94\%) for the Fresh Plant class when using MobileNetV3 for inference. Image credit: B. Janmejay.}
+\label{Diseased_Fresh_Plant}
 \end{figure}
 
-Our evaluation of the performance of the NASNet Mobile architecture demonstrated slightly better results compared to MobileNetV3, with a better fit of the data. This can be attributed to the automated neural architecture search algorithm used by NASNet. The algorithm automatically searches for and adapts the optimal architecture based on the input data, including parameters such as filter sizes, output channels, and the number of convolution layers, to maximize accuracy. This approach ensures that the architecture is specifically tailored to the dataset at hand, resulting in improved performance. These findings suggest that automated architecture search methods like NASNet could provide valuable benefits for the development of effective CNNs in various domains, including agriculture \cite{Yanhui}. The confusion matrix for NASNet Mobile is given in \emph{Table. \ref{Nas Confusion Matrix}.}
 
+\subsection{Results - NASNetMobile}
+
+A similar process was performed for NASNetMobile. After a training iteration for 20 epochs, the resulting training loss and validation loss were observed to be 75.48\% and 77.41\%, respectively. The best validation accuracy of 98.77\% and the best training accuracy was 99.83\%. These findings indicate NASNetMobile and MobileNetV3 performed very similarly throughout the training process despite MobileNetV3 being Google's latest model and having 1 million more trainable parameters than NASNetMobile. 
+
+
+\begin{figure}[h]
+\centerline{\includegraphics[height=10cm, width = .9\linewidth]{Images/Screen Shot 2021-05-10 at 4.36.35 PM.pdf}}
+\caption{NASNetMobile training performance over 20 epochs. \centering{\newline Top: Plots of training and validation loss against epochs. \newline Bottom: Plots of accuracy and validation accuracy against epochs.}}
+\label{NNMStats}
+\end{figure}
+
+NASNetMobile's training performance, depicted in \emph{Fig. \ref{NNMStats}}, exhibited superior results compared to MobileNetV3, demonstrating a better data fit. Both models achieved an optimal fit, but NASNetMobile's enhanced performance is attributed to the automated neural architecture search (NAS) algorithm. NAS automatically adapts optimal architecture, including hyperparameters, filter sizes, output channels, and convolution layer count, thereby ensuring tailored performance for the given dataset. This suggests NASNetMobile's potential utility in developing effective CNNs across various sectors, including agriculture \cite{Yanhui}. The same 106 test images used for MobileNetV3 were also isolated to evaluate NASNetMobile's accuracy and robustness. It is imperative to note that high training metrics don't assure optimal test performance. NASNetMobile's confusion matrix is displayed in \emph{Table \ref{table:NNMCM}}.
+
+\begin{table}[htbp]
+    \centering
+    \caption{NASNetMobile - Confusion Matrix}
+    \label{table:NNMCM}
+    \begin{tabularx}{0.49\textwidth }{ 
+        >{\centering\arraybackslash}X 
+        >{\centering\arraybackslash}X 
+        >{\centering\arraybackslash}X 
+        >{\centering\arraybackslash}X 
+        >{\centering\arraybackslash}X
+        }
+    \hline
+    \textbf{Class (images)} & \textbf{Fresh Leaf} & \textbf{Fresh Plant} & \textbf{Diseased Leaf} & \textbf{Diseased Plant} \\
+    \hline 
+    Fresh Leaf (26) & 26 & 0 & 0 & 0 \\
+    Fresh Plant (27) & 1 & 25 & 0 & 1 \\
+    Diseased Leaf (25) & 2 & 0 & 23 & 0 \\
+    Diseased Plant (28) & 0 & 0 & 0 & 28 \\
+    \hline
+    \end{tabularx} 
+\end{table}
+
+The trained NASNet model delivered high accuracy for each label, achieving an overall accuracy of 97.7\%, outperforming MobileNetV3's 96.7\%. Despite being older and smaller, NASNetMobile outclassed MobileNetV3 in all categories, as demonstrated in \emph{Table \ref{table:NNMPerformance}}. It exhibited consistent performance across all classes, overcoming MobileNetV3's classification challenge with Fresh Cotton Plants. Though differences are slight, this study underscores the superiority of the NAS algorithm over models lacking it.
 
 
 \begin{table}[htbp]
     \centering
-    \begin{tabularx}{0.49\textwidth } { 
-        | >{\centering\arraybackslash}X 
-        | >{\centering\arraybackslash}X 
-        | >{\centering\arraybackslash}X 
-        | >{\centering\arraybackslash}X 
-        | >{\centering\arraybackslash}X |
+    \caption{NASNetMobile - Performance Metrics}
+    \label{table:NNMPerformance}
+    \begin{tabularx}{0.49\textwidth }{ 
+        >{\centering\arraybackslash}X 
+        >{\centering\arraybackslash}X 
+        >{\centering\arraybackslash}X 
+        >{\centering\arraybackslash}X 
+        >{\centering\arraybackslash}X
         }
-        \hline
-         \scriptsize Class (\# Test Data) & \scriptsize Fresh Cotton Leaf & \scriptsize Fresh Cotton Plant & \scriptsize Diseased Cotton Leaf & \scriptsize Diseased Cotton Plant \\
-         \hline 
-         \scriptsize Fresh Cotton Leaf (26) & 26 & 0 & 0 & 0 \\
-         \hline
-         \scriptsize Fresh Cotton Plant (27) & 1 & 25 & 0 & 1 \\
-         \hline
-         \scriptsize Diseased Cotton Leaf (25) & 2 & 0 & 23 & 0 \\
-         \hline
-         \scriptsize Diseased Cotton Plant (28) & 0 & 0 & 0 & 28 \\
-         \hline
-
+    \hline
+    \textbf{Class} & \textbf{Recall} & \textbf{Precision} & \textbf{F1-Score} & \textbf{Accuracy} \\
+    \hline 
+    Fresh Leaf & 1.000 & 0.897 & 0.945 & 98.8\% \\
+    Fresh Plant & 0.926 & 0.962 & 0.944 & 96.1\% \\
+    Diseased Leaf & 0.920 & 0.920 & 0.920 & 97.7\% \\
+    Diseased Plant & 1.000 & 1.000 & 1.000 & 100\% \\
+    \hline
     \end{tabularx} 
-    \caption{NASNet Mobile confusion matrix.}
-    \label{Nas Confusion Matrix}
-\end{table}
-
-
-The accuracy of the proposed model for each label was evaluated using the accuracy formula presented in equation \ref{eq:oa}. The resulting accuracy was found to be 98.8\% for fresh cotton leaves, 96.1\% for fresh cotton plants, 97.7\% for diseased cotton leaves, and 100\% for diseased cotton plants. The overall accuracy of the model was determined to be 97.7\% using NASNet. These results demonstrate the high accuracy and effectiveness of the proposed model in accurately identifying and classifying different categories of cotton plant and leaf health status. 
-
-\begin{table}[htp]
-    \centering
-    \begin{tabularx}{0.49\textwidth } { 
-        | >{\centering\arraybackslash}X 
-        | >{\centering\arraybackslash}X 
-        | >{\centering\arraybackslash}X  
-        | >{\centering\arraybackslash}X |
-        }
-        \hline
-         \scriptsize Class & \scriptsize Recall & \scriptsize Precision & \scriptsize F1 - Score \\
-         \hline 
-         \scriptsize Fresh Cotton Leaf & 1.000 & 0.897 & 0.945 \\
-         \hline
-         \scriptsize Fresh Cotton Plant & 0.926 & 0.962 & 0.944 \\
-         \hline
-         \scriptsize Diseased Cotton Leaf & 0.920 & 0.920 & 0.920 \\
-         \hline
-         \scriptsize Diseased Cotton Plant & 1.000 & 1.000 & 1.000 \\
-         \hline
-
-    \end{tabularx} 
-    
-    \caption{\centering NASNet Recall, Precision, and F1-Score for each class.}
-    \label{Nas Class Scores}
 \end{table}
 
 \section{Mobile Application}
-The mobile application is built using TensorFlow Lite and is currently available on the iOS platform. The pre-trained and customized MobileNetV3 model is bundled with the application, allowing for efficient image classification. The mobile application takes real-time image data from the camera and produces a single classification label based on the pre-trained model's output. An example of the running application is depicted in \emph{Figure \ref{DiseasedCottonLeaf}}. Unfortunately, due to the lack of a unified model bundling and loading solution, the development and deployment of an Android application are currently unavailable. However, plans for Android application development are detailed in the Future Developments section of this paper.
 
-Further development of the mobile application will also result in improvements in user interface and experience, which can be achieved within a shorter development period. Overall, the mobile application provides a portable and efficient solution for cotton disease classification and has the potential for a significant impact on the agricultural industry.
+The mobile application, developed on the iOS platform using TensorFlow Lite, incorporates both MobileNetV3 and NASNetMobile for real-time classification, as shown in \emph{figure \ref{DiseasedCottonLeaf}}. During the testing phase, all 106 test images were scanned using this application on an iPhone 12 Pro Max. The absence of an Android version, due to the lack of a comprehensive solution for model bundling and loading, will be addressed in the future developments section. Future enhancements aim at user interface and experience improvements within a shorter development timeline. The compact mobile application, with each model not exceeding 21.11 MB, provides a portable solution for cotton disease classification, presenting significant potential impact on the agricultural industry.
 
 \begin{figure}[h]
-\centerline{\includegraphics[height=6.7cm, width = 6cm \linewidth]{Images/Diseased Cotton Leaf.png}}
-\caption{An example of classifying diseased cotton leaf via Mobile app }
+\centerline{\includegraphics[height=11.5cm, width =1\linewidth]{Images/Diseased Cotton Leaf.png}}
+\caption{An example of classifying diseased cotton leaf via iOS mobile application.}
 \label{DiseasedCottonLeaf}
 \end{figure}
 
 \section{Future Developments}
 
+\subsection{Dataset Expansion}
+
+The Kaggle dataset used in this study, while sufficient for a proof-of-concept, lacks the comprehensive and robust nature necessary for a thorough disease detection system. Ideally, the dataset would incorporate specific disease labels for both foliar and root ailments, facilitating more nuanced classification beyond the binary healthy/diseased distinction. However, this did not impede our primary objective: to train, via transfer learning, two state-of-the-art models which were previously unused in foliar disease detection and deploy a real-time mobile application. The dataset's limitations also extend to early disease lifecycle detection due to the insufficient data on early-stage diseased plants. The early stage disease manifestation makes it difficult, even for human eyes, to differentiate between healthy/diseased classes. An extensive dataset with expertly annotated disease stages could potentially stimulate new avenues of experimentation.
+
+\subsection{Recommender System}
+
+By expanding the dataset, possibly through merging distinct sources with specific disease labels, a compact recommender system could be implemented, suggesting potential remedies or disease treatments. This strategy, as exemplified by the PlantVillage Nuru system by Pennsylvania State University \cite{PlantVillage}, could particularly benefit underserved communities, delivering an offline, region-specific system demanding minimal updates in regions where cotton cultivation forms a substantial income source.
+
 \subsection{Expanding Access}
-To maximize the potential user base and impact of our work, we plan to develop a cross-platform native integration for both Android and iOS. By creating a uniform design and migrating to a single code base, we aim to streamline the integration of additional application functionality. However, at the time of writing this paper, there is no functional tool available that would enable the bundling and loading of TensorFlow Lite models onto both Android and iOS platforms. Thus, we see a potential for future development in this area, which would provide a valuable mechanism for publishing native applications to both platforms simultaneously. Such a development would not only benefit our project but also other similar projects in the field, enabling them to reach a wider audience and achieve greater impact.
-
-\subsection{Additional Services \& Improvements }
-To enhance the current model, we can perform additional training to enable the model to correctly identify when the picture provided is not of a cotton leaf or plant. This would increase the confidence in the model's performance, much more so than continuing to seek greater prediction accuracy. We could also retrain the model with a grayscale image set to better highlight the areas of an image and rely less on color anomalies. If the application maintains a healthy user base, we could retrieve customer-use survey data to provide a more dynamic dataset. Improvements to the current classifications could aim to provide greater specificity regarding the disease the cotton plant is displaying signs of. With this information, the application could then provide detailed information about these specific diseases and how to care for the plant.
-
+To broaden our work's reach, we aim to develop a cross-platform native integration for Android and iOS, leveraging a unified design and code base to facilitate additional functionality. However, currently, no efficient tool allows TensorFlow Lite model bundling and loading on both platforms. This constraint identifies a potential area for future development that could simultaneously publish native applications on both platforms. Such advancement would benefit not only our methodology but also similar field experiments, enabling wider reach and increased impact.
 
 
 \section{Conclusion}
-This research paper aimed to showcase the practicality and ease of deploying a mobile application for detecting disease in cotton plants. However, the availability of publicly accessible data on cotton diseases remains a significant challenge that needs to be addressed. The study successfully implemented the MobileNetV3 model to classify images into four categories with an impressive overall accuracy of 98.56\%. Moreover, the paper demonstrated the effectiveness of NASNet Mobile with slightly better performance. Throughout the research, a comprehensive and simplified background of the topics was provided to facilitate understanding for a broader audience. This work can serve as a foundation for further research and development in this field.
+
+This study highlights the simplicity and efficiency of transfer learning for training two advanced mobile-compatible models, NASNetMobile and MobileNetV3. By utilizing transfer learning, we leverage pre-trained weights superior at image feature detection compared to models trained from scratch. Fine-tuning these models yielded 97.7\% and 96.7\% accuracy respectively, demonstrating NASNetMobile's superior performance, despite having fewer trainable parameters and being older. Notably, NASNetMobile excelled in identifying fresh cotton plants, a task challenging for MobileNetV3, likely due to NASNetMobile's self-updating architecture during training. The straightforward deployment of these models on an iOS application via TensorFlow Lite underscores the feasibility of this process, requiring only basic hardware and no upfront costs.
 
 
 %\bibliography{references}
@@ -378,42 +497,74 @@ This research paper aimed to showcase the practicality and ease of deploying a m
     
 \begin{thebibliography}{00}
 
-\bibitem{USDA-NASS} National Agricultural Statistics Service, ``Annual Cotton Review'', Available at \href{https://www.nass.usda.gov/Statistics_by_State/Texas/Publications/Current_News_Release/2020_Rls/tx-cotton-review-2020.pdf}{nass.usda.gov}  (2019)
+\bibitem{USDA-NASS} National Agricultural Statistics Service, "Annual Cotton Review," [Online] Available: \href{https://www.nass.usda.gov/Statistics_by_State/Texas/Publications/Current_News_Release/2020_Rls/tx-cotton-review-2020.pdf}{nass.usda.gov}, 2019.
 
-%\bibitem{Gulhane-Gurjar} Mr. Viraj A. Gulhane and Dr. Ajay A. Gurjar, ``Detection of Diseases on Cotton Leaves and Its Possible Diagnosis``, International Journal of Image Processing (IJIP), vol. 5., issue: 5, 2011.
+\bibitem{Gulhane-Gurjar} V. A. Gulhane and A. A. Gurjar, "Detection of Diseases on Cotton Leaves and Its Possible Diagnosis," \textit{International Journal of Image Processing (IJIP)}, vol. 5, no. 5, 2011.
 
-\bibitem{Ashqar-Naser} Belal A.M. Ashqar, Samy S. Abu-Naser, ``Image-Based Tomato Leaves Diseases Detection Using Deep Learning'', International Journal of Academic Engineering Research (IJAER), Vol. 2, Issue 12, December 2018, pp. 10-16, ISSN: 2000-001X
+\bibitem{Ashqar-Naser} Belal A.M. Ashqar, Samy S. Abu-Naser, "Image-Based Tomato Leaves Diseases Detection Using Deep Learning," International Journal of Academic Engineering Research (IJAER), Vol. 2, Issue 12, December 2018, pp. 10-16, ISSN: 2000-001X
 
-\bibitem{Gehlot-Saini} Mamta Gehlot and Madan Lal Saini, ``Analysis of Different CNN Architectures For Tomato Leaf Disease Classification'', 5th IEEE International Conference on Recent Advances and Innovations in Engineering, ICRAIE 2020 (IEEE Record\#51050), 2020. 
+\bibitem{Gehlot-Saini} Mamta Gehlot and Madan Lal Saini, "Analysis of Different CNN Architectures For Tomato Leaf Disease Classification," 5th IEEE International Conference on Recent Advances and Innovations in Engineering, ICRAIE 2020 (IEEE Record\#51050), 2020. 
 
-\bibitem{Sarangdhar-Pawar} Sarangdhar, A.A., and Pnwar, V.R., ``Machine learning regression technique for cotton leaf disease detection and controlling using IoT'', In 2017 International Conference of Electronics, Communications and Aerospace Technology (ICECA), 2017, (Vol. 2), pp. 449-454). IEEE.
+\bibitem{Sarangdhar-Pawar} A. A. Sarangdhar and V. R. Pawar, "Machine learning regression technique for cotton leaf disease detection and controlling using IoT," in \textit{2017 International Conference of Electronics, Communications and Aerospace Technology (ICECA)}, 2017, vol. 2, pp. 449-454.
 
-\bibitem{Brownlee} Jason Brownlee. ``A Gentle Introduction to Transfer Learning for Deep Learning``. Machine Learning Mastery, December 2017, Available at \href{https://machinelearningmastery.com/transfer-learning-for-deep-learning/#:~:text=Transfer\%20learning\%20is\%20a\%20machine,model\%20on\%20a\%20second\%20task.&text=Common\%20examples\%20of\%20transfer\%20learning,your\%20own\%20predictive\%20modeling\%20problems.}{machinelearningmastery.com}
+\bibitem{Brownlee} J. Brownlee, "A Gentle Introduction to Transfer Learning for Deep Learning," Machine Learning Mastery, December, 2017. [Online], Available: \href{https://machinelearningmastery.com/transfer-learning-for-deep-learning/#:~:text=Transfer\%20learning\%20is\%20a\%20machine,model\%20on\%20a\%20second\%20task.&text=Common\%20examples\%20of\%20transfer\%20learning,your\%20own\%20predictive\%20modeling\%20problems.}{machinelearningmastery.com}
 
-\bibitem{Disease Detection} O. Kulkarni, ``Crop Disease Detection Using Deep Learning``, 2018 Fourth International Conference on Computing Communication Control and Automation (ICCUBEA), Pune, India, 2018, pp. 1-4, doi: 10.1109/ICCUBEA.2018.8697390.
+\bibitem{Disease Detection} O. Kulkarni, "Crop Disease Detection Using Deep Learning," \textit{2018 Fourth International Conference on Computing Communication Control and Automation (ICCUBEA)}, Pune, India, 2018, pp. 1-4, doi: 10.1109/ICCUBEA.2018.8697390.
 
-\bibitem{Disease Diagnosing} H. Park, E. JeeSook and S. Kim, ``Crops Disease Diagnosing Using Image-Based Deep Learning Mechanism`` , 2018 International Conference on Computing and Network Communications (CoCoNet), Astana, Kazakhstan, 2018, pp. 23-26, doi: 10.1109/CoCoNet.2018.8476914.
+\bibitem{Disease Diagnosing} H. Park, E. JeeSook and S. Kim, "Crops Disease Diagnosing Using Image-Based Deep Learning Mechanism," \textit{2018 International Conference on Computing and Network Communications (CoCoNet)}, Astana, Kazakhstan, 2018, pp. 23-26, doi: 10.1109/CoCoNet.2018.8476914.
 
-\bibitem{Kaggle} Bhoi, Janmejay. ``Cotton Disease Dataset``. Kaggle, 24 Sept. 2020, Available at \href{https://www.kaggle.com/janmejaybhoi/cotton-disease-dataset/notebooks}{kaggle.com}
+\bibitem{WandB} C. Lepelaars, "The Evolution Of Mobile CNN Architectures," \textit{WandB}, 8 November 2022, [Online], Available: \href{https://wandb.ai/carlolepelaars/mobile_architectures/reports/The-Evolution-Of-Mobile-CNN-Architectures--VmlldzoyMDQ0ODQ}{wandb.ai}
 
-\bibitem{Howard-Sandler} Andrew Howard, Mark Sandler, et. al, ``Searching for MobileNetV3'', 2019 IEEE/CVF International Conference on Computer Vision (ICCV), Seoul, Korea (South), 2019, pp. 1314-1324, doi: 10.1109/ICCV.2019.00140.
+\bibitem{Kaggle} B. Janmejay, "Cotton Disease Dataset," \textit{Kaggle}, 24 September 2020, [Online] Available: \href{https://www.kaggle.com/janmejaybhoi/cotton-disease-dataset/notebooks}{kaggle.com}
 
+\bibitem{Singh-etal} A. Singh, B. Ganapathysubramanian, S. Sarkar, and A. K. Singh, "Deep learning for plant stress phenotyping: Trends and future perspectives," \textit{Frontiers in Plant Science}, vol. 7, p. 1510, 2016.
+
+\bibitem{Mohanty-etal} S. P. Mohanty, D. P. Hughes, and M. Salathé, "Using deep learning for image-based plant disease detection," \textit{Frontiers in Plant Science}, vol. 7, p. 1419, 2016.
+
+\bibitem{Bhoi} J. M. Bhoi, "Identification of diseases in cotton leaves using machine learning," \textit{Research Square}, 2020.
+
+\bibitem{Dey-etal} P. Dey, P. Roy, and S. Dey, "Automated classification of cotton leaf diseases using deep belief network," \textit{Computers and Electronics in Agriculture}, vol. 173, p. 105413, 2020.
+
+\bibitem{Kazemi-etal} S. H. Kazemi, S. Mohsenzadeh, and A. Fooladgar, "A deep transfer learning approach for tomato diseases detection," \textit{Computers and Electronics in Agriculture}, vol. 162, pp. 706-713, 2019.
+
+\bibitem{Sharma-etal} P. Sharma, A. K. Pandey, and M. Singh, "Potato disease classification using transfer learning approach," \textit{Agricultural Research}, vol. 10, no. 1, pp. 57-66, 2021.
+
+\bibitem{Siddique-etal} A. B. Siddique, M. N. Akhtar, and M. Shafique, "Deep Learning Based Plant Disease Recognition using Mobile Devices," \textit{Procedia Computer Science}, vol. 171, pp. 1129-1136, 2020.
+
+\bibitem{Uddin-etal} M. S. Uddin, M. A. H. Bhuiyan, M. R. Islam, and M. Z. Alom, "A deep learning based mobile application for mango disease detection," \textit{Computers and Electronics in Agriculture}, vol. 186, p. 106024, 2021.
+
+\bibitem{Shu} M. Shu, "Deep Learning for image classification on very small datasets using transfer learning," Iowa State University, Summer 2019.
+
+\bibitem{Reynolds} R. Reynolds, "New computer vision challenge wants to teach robots to see in 3D," \textit{NewScientist}, vol. 234, no. 3123, pp. 28-31, Apr. 2017, Available: \href{https://www.newscientist.com/article/2127131-new-computer-vision-challenge-wants-to-teach-robots-to-see-in-3d/}{NewScientist.com}.
+
+\bibitem{genuineimpact} genuineimpact, "Cost to train AI system," genuineimpact, 2021. [Online]. Available: \href{https://i.redd.it/c9lyy4252qia1.png}{genuineimpact.com}.
+
+\bibitem{Smeda} K. Smeda, "Understand the Architecture of CNN," \textit{Towards Data Science}, Oct. 2019. [Online]. Available: \href{https://towardsdatascience.com/understand-the-architecture-of-cnn-90a25e244c7}{Towards Data Science}.
+
+
+\bibitem{Howard-Sandler} A. Howard, M. Sandler, et al., "Searching for MobileNetV3," in \textit{2019 IEEE/CVF International Conference on Computer Vision (ICCV)}, Seoul, Korea (South), 2019, pp. 1314-1324, doi: 10.1109/ICCV.2019.00140.
+
+\bibitem{Yanhui} C. Yanhui, "From AlexNet to NASNet: A Brief History and Introduction of Convolutional Neural Networks," \textit{Towards Data Science}, 2021. [Online]. Available: \href{https://towardsdatascience.com/from-alexnet-to-NASNet-a-brief-history-and-introduction-of-convolutional-neural-networks-cf63bf3320e1}{towardsdatascience.com}
+
+\bibitem{paperswithcode} paperswithcode, "MobileNet V3 Large", \textit{paperswithcode}, 2021. [Online] Available: \href{https://paperswithcode.com/lib/torchvision/mobilenet-v3}{paperswithcode.com}
+
+\bibitem{Howard-Zhu} A. G. Howard, M. Zhu, B. Chen, D. Kalenichenko, W. Wang, T. Weyand, M. Andreetto, and H. Adam, "Mobilenets: Efficient convolutional neural networks for mobile vision applications," \textit{arXiv preprint} arXiv:1704.04861, 2017.
+
+\bibitem{paperswithcodenas} paperswithcode, "NASNetMobile", \textit{paperswithcode}, 2021. [Online] Available: \href{https://paperswithcode.com/lib/torchvision/mnasnet-1-0}{paperswithcode.com}
+
+
+\bibitem{PlantVillage} PlantVillage, "Solutions - Nuru", \textit{PlantVillage PSU}, 2020. [Online]. Available: \href{https://plantvillage.psu.edu/projects}{plantvillage.com}
 
 %\bibitem{Shorten-Khosh} Shorten, C., Khoshgoftaar, T.M. ``A survey on Image Data Augmentation for Deep Learning''. J Big Data 6, 60 (2019). https://doi.org/10.1186/s40537-019-0197-0
 
-\bibitem{Howard-Zhu} A. G. Howard, M. Zhu, B. Chen, D. Kalenichenko, W. Wang, T. Weyand, M. Andreetto, and H. Adam, “Mobilenets: Efficient convolutional neural networks for mobile vision applications,” arXiv preprintarXiv:1704.04861, 2017.
+%\bibitem{Gulhane-Gurjar} Mr. Viraj A. Gulhane and Dr. Ajay A. Gurjar, ``Detection of Diseases on Cotton Leaves and Its Possible Diagnosis``, International Journal of Image Processing (IJIP), vol. 5., issue: 5, 2011.
 
-\bibitem{Smeda} Kousai, Smeda. ``Understand the Architecture of CNN'', Towards Data Science, October 2019, Available at \href{https://towardsdatascience.com/understand-the-architecture-of-cnn-90a25e244c7}{Towards Data Science}
-
-\bibitem{Yanhui} Chen Yanhui, ``From AlexNet to NASNet: A Brief History and Introduction of Convolutional Neural Networks. Towards Data Science. 2021. Available at \href{https://towardsdatascience.com/from-alexnet-to-NASNet-a-brief-history-and-introduction-of-convolutional-neural-networks-cf63bf3320e1}{Towards Data Science}
-
-\bibitem{Zoph-Vasudevan} Barret Zoph, Vijay Vasudevan et. al., ``Learning Transferable Architectures for Scalable Image Recognition'', Google Brain, April 2018.
+%\bibitem{Zoph-Vasudevan} Barret Zoph, Vijay Vasudevan et. al., ``Learning Transferable Architectures for Scalable Image Recognition'', Google Brain, April 2018.
 
 %\bibitem{Simonyan-Zisserman} Karen Simonyan, Andrew Zisserman. ``Very Deep Convolutional Networks For Large-Scale Image Recognition'', Department of Engineering Science, University of Oxford. April 2015. 
 
 %\bibitem{Neurohive} ``VGG16 - Convolutional Network for Classification and Detection''. November 2018. Available at \href{https://neurohive.io/en/popular-networks/vgg16/}{Neurohive.com}
 
-%\bibitem{Shu} Mengyin Shu, ``Deep Learning for image classification on very small datasets using transfer learning'', Iowa State University, Summer 2019.
 
 %\bibitem{Progrev} ``How to Prevent Overfitting | Regularization''. Available at \href{https://programming-review.com/machine-learning/overfitting#cross-validation}{programming-review.com}
 
@@ -438,27 +589,8 @@ This research paper aimed to showcase the practicality and ease of deploying a m
 
 %\bibitem{Uddin-et-al} Uddin, M. S., Bhuiyan, M. A. H., Islam, M. R., & Alom, M. Z. (2021). A deep learning based mobile application for mango disease detection. Computers and Electronics in Agriculture, 186, 106024.
 
+% \bibitem{m} M. Abd Elaziz, A. Dahou, N. A. Alsaleh, A. H. Elsheikh, A. I. Saba, and M. Ahmadein, "Boosting COVID-19 image classification using MobileNetV3 and aquila optimizer algorithm," \textit{Entropy}, vol. 23, no. 11, pp. 1383, 2021.
 
-\bibitem{Gulhane-Gurjar} Gulhane, V. A., \& Gurjar, A. A. (2011). Detection of Diseases on Cotton Leaves and Its Possible Diagnosis. International Journal of Image Processing (IJIP), 5(5).
-
-\bibitem{Singh-etal} Singh, A., Ganapathysubramanian, B., Sarkar, S., \& Singh, A. K. (2016). Deep learning for plant stress phenotyping: Trends and future perspectives. Frontiers in Plant Science, 7, 1510.
-
-\bibitem{Mohanty-etal} Mohanty, S. P., Hughes, D. P., \& Salathé, M. (2016). Using deep learning for image-based plant disease detection. Frontiers in Plant Science, 7, 1419.
-
-\bibitem{Bhoi} Bhoi, J. M. (2020). Identification of diseases in cotton leaves using machine learning. Research Square.
-
-\bibitem{Dey-etal} Dey, P., Roy, P., \& Dey, S. (2020). Automated classification of cotton leaf diseases using deep belief network. Computers and Electronics in Agriculture, 173, 105413.
-
-\bibitem{Kazemi-etal} Kazemi, S. H., Mohsenzadeh, S., \& Fooladgar, A. (2019). A deep transfer learning approach for tomato diseases detection. Computers and Electronics in Agriculture, 162, 706-713.
-
-\bibitem{Sharma-etal} Sharma, P., Pandey, A. K., \& Singh, M. (2021). Potato disease classification using transfer learning approach. Agricultural Research, 10(1), 57-66.
-
-\bibitem{Siddique-etal} Siddique, A. B., Akhtar, M. N., \& Shafique, M. (2020). Deep Learning Based Plant Disease Recognition using Mobile Devices. Procedia Computer Science, 171, 1129-1136.
-
-\bibitem{Uddin-etal} Uddin, M. S., Bhuiyan, M. A. H., Islam, M. R., \& Alom, M. Z. (2021). A deep learning based mobile application for mango disease detection. Computers and Electronics in Agriculture, 186, 106024.
-
-
-\bibitem{m}Abd Elaziz, M., Dahou, A., Alsaleh, N. A., Elsheikh, A. H., Saba, A. I., \& Ahmadein, M. (2021). Boosting COVID-19 image classification using MobileNetV3 and aquila optimizer algorithm. Entropy, 23(11), 1383.
 
 
 
