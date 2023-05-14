@@ -94,8 +94,8 @@ Transfer learning, a machine learning technique, leverages a pre-trained modelâ€
 As depicted in \emph{Fig. \ref{Transfer Learning}}, transfer learning employs a pre-trained model, often sourced from PyTorch or Tensorflow, while 'freezing' the depthwise and bottleneck layers, where the majority of pre-trained weights reside. Preserving these weights is beneficial due to their capacity to discern a variety of features. However, as these weights may not recognize novel targets such as diseased foliage, fine-tuning the adaptive average pooling, fully connected, and output layers is essential. This process equips a model to classify diseased foliage, despite its lack of prior training on such data.
 
 \begin{figure}[h]
-\centerline{\includegraphics[height=6.5cm, width=1\linewidth]{Images/MobileNet_Small.png}}
-\caption{Visualization of transfer learning implementation in a CNN inspired by MobileNetV3. The diagram highlights the preservation of convolutional layers to utilize their wide feature discernment ability, with emphasis on fine-tuning the pooling and output layers for the specific task of cotton foliage disease identification.}
+\centerline{\includegraphics[height=6.5cm, width=1\linewidth]{Images/MobileNetV3_layers.drawio.png}}
+\caption{Visualization of transfer learning implementation with a sample architecture inspired by MobileNetV3. The diagram highlights the preservation of pretrained layers to utilize their wide feature discernment ability, with emphasis on fine-tuning the pooling and output layers for the specific task of cotton foliage disease identification.}
 \label{Transfer Learning}
 \end{figure}
 
@@ -115,7 +115,7 @@ In this study, we meticulously adhered to a standardized data pre-processing pro
  
 \begin{figure*}[ht]
 \centering
-\includegraphics[height=3.2cm, width=1\linewidth]{Images/Data_Augmentation2_LI (2).pdf}
+\includegraphics[height=3.2cm, width=1\linewidth]{Images/Data_Augmentation5.png}
 \caption{Example of data augmentation techniques applied to an image: a raw image undergoes various transformations, such as rotation, scaling, flipping, and shearing, to increase the diversity of the training dataset and improve model generalization.}
 \label{Augment}
 \end{figure*}
@@ -255,7 +255,7 @@ Squeeze-and-Excitation Block \\
 %\begin{table}[ht]
 %\centering
 %\caption{NASNetMobile - Architecture}
-%\begin{tabularx}{\columnwidth}{>{\centering\arraybackslash}X}
+%\begin{tabular}{l}
 %\hline
 %1x1 Convolution \\
 %Batch Normalization \\
@@ -270,7 +270,7 @@ Squeeze-and-Excitation Block \\
 %Softmax \\
 %Squeeze-and-Excitation Block \\
 %\hline
-%\end{tabularx}
+%\end{tabular}
 %\label{table:NASNetMobile-Architecture}
 %\end{table}
 
@@ -336,7 +336,7 @@ Based on the experimental results, the training loss and validation loss were ob
 \end{figure}
 
 
-CNNS are prevalent in image classification, with the relationship between training and validation loss often intricate. A model overfits if the validation loss considerably exceeds the training loss, while it underfits if the training loss either plateaus or declines without a corresponding decrease in validation loss. This study observed an optimal fit, with both losses descending to a stable point with a minimal gap.
+CNNs are prevalent in image classification, with the relationship between training and validation loss often intricate. A model overfits if the validation loss considerably exceeds the training loss, while it underfits if the training loss either plateaus or declines without a corresponding decrease in validation loss. This study observed an optimal fit, with both losses descending to a stable point with a minimal gap.
 
 For assessing system accuracy and robustness, 106 test images were deliberately isolated from the training dataset, providing diverse, unseen data for performance evaluation. The test phase allowed for an appraisal of the model's generalization ability, crucial for real-world applications. The resulting test data provided a reliable estimate of system accuracy and reliability, thereby demonstrating its efficacy in cotton disease detection. This data further facilitated the generation of a confusion matrix displayed in \emph{Table \ref{table:MNCM}}.
 
