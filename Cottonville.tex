@@ -20,6 +20,7 @@
 \usepackage{float}
 \usepackage{siunitx}
 \usepackage{dcolumn}
+
 \renewcommand\tabularxcolumn[1]{m{#1}}
 \hypersetup{
     colorlinks=false,
@@ -37,9 +38,7 @@
 
 \begin{document}
 
-\title{Cotton Care: Harnessing Transfer Learning for Rapid Health Assessment with a Mobile App\\}
-
-
+\title{Cotton Care: Harnessing Transfer Learning for Real-Time Health Assessment with Mobile Devices\\}
 
 \makeatletter
 \newcommand{\linebreakand}{%
@@ -49,23 +48,34 @@
 }
 \makeatother
 
-
-\author{
-\IEEEauthorblockN{Emerson A. de Lemmus,
-Brendan P. McAntosh, 
-ABM Rezbaul Islam Ph.D., and
-Kolby T. Stafford}
-\IEEEauthorblockA{Department of Computer Science,
-Sam Houston State University\\
-United States\\
-}}
+\author{\IEEEauthorblockN{1\textsuperscript{st} Emerson A. de Lemmus}
+\IEEEauthorblockA{\textit{Bioinformatics Group} \\
+\textit{Cell Signaling Technology}\\
+Boston, United States \\  
+\href{https://orcid.org/0000-0001-8579-9453}{ORCID: 0000-0001-8579-9453}
+}
+\and
+\IEEEauthorblockN{2\textsuperscript{nd} Brendan P. McAntosh}
+\IEEEauthorblockA{\textit{Department of Computer Science} \\
+\textit{Sam Houston State University}\\
+Huntsville, United States \\ 
+\href{https://orcid.org/0009-0008-7520-7432}{ORCID: 0009-0008-7520-7432}
+}
+\and
+\IEEEauthorblockN{3\textsuperscript{rd} ABM Rezbaul Islam Ph.D.}
+\IEEEauthorblockA{\textit{Department of Computer Science} \\
+\textit{Sam Houston State University}\\
+Huntsville, United States \\ 
+\href{https://orcid.org/0000-0003-2610-7343}{ORCID: 0000-0003-2610-7343}
+}
+}
 
 
 
 \maketitle
 
 \begin{abstract}
-Cotton, a crucial crop in Texas, frequently experiences substantial yield reduction due to disease afflictions. This paper introduces a proof-of-concept mobile application employs transfer learning on pre-trained MobileNetV3 and NASNetMobile models to detect cotton plant diseases. The system addresses a four-class problem, identifying the health status of cotton plants or leaves. Using TensorFlow, these models are refined with publicly available data and deployed on an iOS app. This study also provides a performance assessment of both models, previously unexplored in this specific context. The methodology, showcasing significant potential for real-world implementations, recorded overall accuracies of 97.7\% for NASNetMobile and 96.7\% for MobileNetV3.
+Cotton frequently experiences substantial yield reduction due to disease afflictions. This paper introduces a proof-of-concept mobile application that employs transfer learning with pre-trained MobileNetV3 and NASNetMobile models to detect cotton plant diseases. The system addresses a four-class problem, identifying the health status of cotton plants or leaves. Using TensorFlow, these models are refined with publicly available data and deployed on an iOS app. This study also provides a performance assessment of both models, previously unexplored in this specific context. The methodology, showcasing significant potential for real-world implementations, recorded overall accuracies of 97.7\% for NASNetMobile and 96.7\% for MobileNetV3.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -77,11 +87,9 @@ According to the USDA's National Agriculture Statistics Service (NASS), Texas pr
 
 The deep learning (DL) revolution has significantly impacted the AI industry in recent years. Since its 2012 victory over traditional machine learning algorithms in the ImageNet Large Scale Visual Recognition Challenge (ILSVRC), DL has become the leading solution for object recognition \cite{Ashqar-Naser}\cite{Gehlot-Saini}. Convolutional Neural Networks (CNNs) excel in object identification and image classification \cite{Sarangdhar-Pawar}.
 
-Transfer learning, a popular approach in DL, leverages pre-trained CNNs for computer vision tasks instead of building a model from scratch \cite{Brownlee}. This technique reuses learned knowledge from one task for another, effectively addressing computational resource limitations in various applications, including computer vision, natural language processing, and speech recognition. By fine-tuning a pre-trained CNN model with high-quality images, it can identify and classify objects it was not originally trained for.
+Transfer learning, a popular approach in DL, leverages pre-trained CNNs for computer vision tasks instead of building a model from scratch \cite{Brownlee}. This technique reuses learned knowledge from one task for another, effectively addressing computational resource limitations in various applications, including computer vision, natural language processing, and speech recognition. 
 
-This study utilizes transfer learning for efficient fine-tuning of pre-trained models to deliver plant health information via a mobile application, leveraging its proven efficacy in crop disease detection \cite{Disease Detection} \cite{Disease Diagnosing}. With the increasing capability of edge devices, deploying computer vision models offers an accessible and practical approach to real-world data insights. To increase the depth of our study, we leverage two state-of-the-art Google models -- MobileNetV3 (2019) and NASNetMobile (2018) \cite{WandB} -- created and optimised for mobile/edge devices.  A performance comparison is made by fine-tuning the weights of these models to capture a snapshot of cotton disease classification using edge devices. 
-
-We employ a publicly available dataset \cite{Kaggle} which contains images and labels for healthy and diseased cotton leaves and plants. TensorFlow Lite is used in deploying these models on mobile devices, simplifying the implementation of transfer learning.
+With the increasing capability of edge devices, deploying computer vision models offers an accessible and practical approach to gathering real-world data insights. This study utilizes transfer learning to deliver plant health information via a mobile application, leveraging its proven efficacy in crop disease detection \cite{Disease Detection} \cite{Disease Diagnosing}. To increase the depth of our study, we leverage two state-of-the-art Google models -- MobileNetV3 (2019) and NASNetMobile (2018) \cite{WandB} -- created and optimised for mobile/edge devices. We employ a publicly available dataset \cite{Kaggle} which contains images and labels for healthy and diseased cotton leaves and plants. TensorFlow Lite is used to deploy models on mobile devices, simplifying the implementation of transfer learning.
 
 
 \section{RELATED WORKS}
@@ -90,23 +98,23 @@ Numerous studies demonstrate the effectiveness of deep learning (DL) in plant di
 
 \section{Methodology}
 
-This study aims to demonstrate an accessible, efficient, and real-time mobile application for cotton disease detection, utilizing transfer learning. The app uses a mobile phone camera to provide instantaneous health classification of cotton plants or leaves, functioning even in areas with limited internet connectivity. In contrast to manual disease detection methods, which can be labor-intensive, expensive, and slow, a real-time mobile application can  provide immediate classification. Importantly, we deploy MobileNetV3-Large and NASNetMobile, two previously unused computer vision models in the cotton disease domain space. This methodology also offers a performance baseline for cotton disease studies using future iterations of MobileNet and NASNet architectures. 
+This study aims to demonstrate an accessible, efficient, and real-time mobile application for cotton disease detection, utilizing transfer learning. The app uses a mobile phone camera to provide instantaneous health classification of cotton plants or leaves, functioning even in areas with limited internet connectivity. In contrast to manual disease detection methods, which can be labor-intensive, expensive, and slow, a real-time mobile application can provide immediate classification. Importantly, we deploy MobileNetV3-Large and NASNetMobile, two previously unused computer vision models in the cotton disease domain space. This methodology also offers a performance baseline for cotton disease studies using future iterations of MobileNet and NASNet architectures. 
 
 
 \subsection{Transfer Learning}
 
 Transfer learning, leverages a pre-trained model—often trained on a large dataset like ImageNet—to fine-tune the learning process for a specific task \cite{Shu}. This approach capitalizes on the pre-trained model's generalized weights, facilitating swift prototyping of architectures while being cost-effective. For instance, training a model from scratch on ImageNet, a 14-million-image dataset \cite{Reynolds}, is prohibitively expensive for most researchers. In 2017, the cost for each training iteration was estimated at \$1,112.64, excluding upfront hardware costs \cite{genuineimpact}.
 
-As depicted in \emph{Fig. \ref{Transfer Learning}}, transfer learning employs a pre-trained model, freezing most layers to preserve its weights, or knowledge, from training on millions of images. These frozen layers are beneficial due to their learned capacity to discern a variety of image features. However, for the recognition of new targets like diseased foliage, fine-tuning the model's latter layers is crucial. We partially retrain the model to classify diseased foliage, despite its lack of prior training on this data.
+Depicted in \emph{Fig. \ref{Transfer Learning}}, transfer learning employs a pre-trained model, freezing most layers to preserve its weights, or knowledge, from training on millions of images. These frozen layers are beneficial due to their learned capacity to discern a variety of image features. However, for the recognition of new targets like diseased foliage, fine-tuning the model's unfrozen layers is crucial.
 
 \begin{figure}[h]
 \centerline{\includegraphics[height=6.5cm, width=1\linewidth]{Images/MobileNetV3_layers.drawio.png}}
-\caption{Visualisation of a pre-trained model's architecture. The depicted architecture is inspired by MobileNetV3. Each block represents a model layer that is either frozen or unfrozen when implementing transfer learning. It is common to preserve the core convolution layers found in the Depthwise and Bottleneck sections since they retain the ability to discern a wide range of image features. The pooling, fully connected and output layers are also commonly found in many CNN models and must be fine-tuned to recognize new targets.}
+\caption{Visualisation of a pre-trained model's architecture. The depicted architecture is inspired by MobileNetV3. Each block represents a model layer that is either frozen or unfrozen during transfer learning. It is common to preserve the core convolution layers found in the Depthwise and Bottleneck sections since they retain the ability to discern a wide range of image features. The pooling, fully connected, and output layers, also commonly found in many CNN models, must be retrained to identify new targets.}
 \label{Transfer Learning}
 \end{figure}
 
 \subsection{Dataset}
-We utilize a public dataset sourced from Kaggle \cite{Kaggle}. It contains 2,310 labeled images of cotton plants and leaves. Images are classified into four categories: diseased cotton leaf, diseased cotton plant, fresh cotton leaf, and fresh cotton plant, as sampled in \emph{Fig. \ref{CottonImages}}. The split is 1764 training, 440 validation, and 106 testing images.  Both MobileNetV3 and NASNetMobile were trained with the same data with their training performance evaluated against the validation set and final overall accuracy against the testing set. 
+We utilize a public dataset sourced from Kaggle \cite{Kaggle}. It contains 2,310 labeled images of cotton plants and leaves in the RGB colorspace. Images are classified into four categories: diseased cotton leaf, diseased cotton plant, fresh cotton leaf, and fresh cotton plant, as sampled in \emph{Fig. \ref{CottonImages}}. The split is 1764 training, 440 validation, and 106 testing images.  Both MobileNetV3 and NASNetMobile were trained with the same data with their training performance evaluated against the validation set and final overall accuracy against the testing set. 
 
 \begin{figure}[h]
 \centerline{\includegraphics[height=8.5cm, width=.9\linewidth]{Images/cotton images.drawio.png}}
@@ -116,7 +124,7 @@ We utilize a public dataset sourced from Kaggle \cite{Kaggle}. It contains 2,310
 
 \subsection{Data pre-processing}
 
-For this study we created a standard data pre-processing protocol for both models promoting learning equality across both models. It converts raw data into a trainable format and highlighting key image features. The dataset was resized to 224 x 224 pixels to meet MobileNetV3 and NASNetMobile input requirements, preventing feature loss or compression artifacts. We augmented the data by creating modified copies of existing images, as shown in \emph{Fig. \ref{Augment}}, enhancing model generalization with transformations like rotation, flipping, shear, and zoom. \emph{Table \ref{table:DataAug}} details the augmentation parameters. While greyscaling and color manipulations were considered, we chose to keep the original RGB colorspace. Each training image was augmented to create five unique images, expanding the dataset from 1763 to 8816 images. We split the augmented dataset 80/20 for training/validation and kept the original 106 test images.
+For this study, we created a standard data pre-processing protocol for both models promoting learning equality across both models. It converts raw data into a trainable format and highlights key image features. The dataset was resized to 224 x 224 pixels to meet MobileNetV3 and NASNetMobile input requirements while preventing feature loss or compression artifacts. We augmented the data by creating modified copies of existing images, as shown in \emph{Fig. \ref{Augment}}, enhancing model generalization with transformations like rotation, flipping, shear, and zoom. \emph{Table \ref{table:DataAug}} details the augmentation parameters. Data augmentation expanded the dataset from 1763 to 8816 images. We split the augmented dataset 80/20 for training/validation and kept the original 106 test images.
  
 \begin{figure*}[ht]
 \centering
@@ -317,7 +325,7 @@ Despite a brief 20-epoch training phase, Google Colab's free environment constra
     \multicolumn{1}{c|}{\textbf{Parameter}} & \multicolumn{1}{c}{\textbf{Value}} \\
     \hline
     Learning Rate & 0.064 \\
-    Epochs & 20 \\
+    Training Steps & 20 \\
     LR Gamma & 0.973 \\
     Momentum & 0.9 \\
     Batch Size & 128 \\
@@ -337,7 +345,7 @@ Despite a brief 20-epoch training phase, Google Colab's free environment constra
     \multicolumn{1}{c|}{\textbf{Parameter}} & \multicolumn{1}{c}{\textbf{Value}} \\
     \hline
     Learning Rate & 0.1 \\
-    Epochs & 20 \\
+    Training Steps & 20 \\
     LR Gamma & 0.1 \\
     Momentum & 0.9 \\
     Batch Size & 32 \\
@@ -376,7 +384,7 @@ To evaluate model accuracy and robustness, we isolated 106 test images from the 
     \hline 
     Fresh Leaf (26) & 24 & 0 & 2 & 0 \\
     Fresh Plant (27) & 0 & 22 & 0 & 5 \\
-    Diseased Leaf (25) & 0 & 0 & 24 & 1 \\
+    Diseased Leaf (25) & 0 & 0 & 24 & 1 \\ 
     Diseased Plant (28) & 0 & 0 & 0 & 28 \\
     \hline
     \end{tabularx} 
@@ -484,7 +492,7 @@ Evaluating the NASNetMobile model during the test phase, delivered high accuracy
 
 \section{Mobile Application}
 
-The mobile application, developed on the iOS platform using TensorFlow Lite, incorporates both MobileNetV3 and NASNetMobile for real-time classification, as shown in \emph{figure \ref{DiseasedCottonLeaf}}. During the testing phase, all 106 test images were scanned using this application on an iPhone 12 Pro Max. The absence of an Android version, due to the lack of a comprehensive solution for model bundling and loading for both platforms, can be addressed in future iterations. The compact mobile application, with each model not exceeding 21.11 MB, provides a portable solution for cotton disease classification, presenting significant potential impact on the agricultural industry.
+The mobile application, developed on the iOS platform using TensorFlow Lite, incorporates both MobileNetV3 and NASNetMobile for real-time classification, as shown in \emph{fig. \ref{DiseasedCottonLeaf}}. During the testing phase, all 106 test images were scanned using this application on an iPhone 12 Pro Max. The absence of an Android version, due to the lack of a comprehensive solution for model bundling and loading for both platforms, can be addressed in future iterations. The compact mobile application, with each model not exceeding 21.11 MB, provides a portable solution for cotton disease classification, presenting significant potential impact on the agricultural industry.
 
 \begin{figure}[h]
 \centerline{\includegraphics[height=11.5cm, width =.9\linewidth]{Images/Diseased Cotton Leaf.png}}
@@ -502,9 +510,9 @@ The Kaggle dataset used in this study, while sufficient for a proof-of-concept, 
 
 By expanding the dataset, possibly through merging distinct sources with specific disease labels, a compact recommender system could be implemented, suggesting potential remedies or disease treatments. This strategy, as exemplified by the PlantVillage Nuru system by Pennsylvania State University \cite{PlantVillage}, could particularly benefit underserved communities, delivering an offline, region-specific system demanding minimal updates in regions where cotton cultivation forms a substantial income source.
 
-\subsection{Continual Learning}
+\subsection{Scalability}
 
-Continual learning, also known as lifelong learning, is a promising approach in machine learning that can significantly enhance the classification of cotton diseases. This methodology involves a model continuously learning and adapting from a stream of data, allowing it to incorporate new information about cotton diseases over time without forgetting previous knowledge. The continual learning model can incrementally update its understanding of different disease patterns as new data, such as changes in disease manifestation or the introduction of new diseases, become available. Thus, the application of continual learning to cotton disease classification can provide more accurate and timely diagnostics, aiding in better disease management and potentially reducing crop losses.
+
 
 \section{Conclusion}
 
