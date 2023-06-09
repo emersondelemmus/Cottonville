@@ -70,8 +70,6 @@ Huntsville, United States \\
 }
 }
 
-
-
 \maketitle
 
 \begin{abstract}
@@ -155,33 +153,33 @@ Validation Split & .20 \\
 \end{table}
 
 
-\subsection{Defining Convolutional Neural Networks}
+% \subsection{Defining Convolutional Neural Networks}
 
-Convolutional Neural Networks (CNNs), comprising sequential layers for processing input images, are a potent tool for image classification. The process begins with the first layer applying multiple convolution operations to the input image, generating a feature map matrix. This matrix undergoes dimension reduction through resizing as it progresses through the layers. The output from one layer serves as input to the subsequent layer, culminating in a fully connected layer that compacts all features into a vector for the final softmax layer, which in turn outputs the classifier labels and their associated probabilities.
+% Convolutional Neural Networks (CNNs), comprising sequential layers for processing input images, are a potent tool for image classification. The process begins with the first layer applying multiple convolution operations to the input image, generating a feature map matrix. This matrix undergoes dimension reduction through resizing as it progresses through the layers. The output from one layer serves as input to the subsequent layer, culminating in a fully connected layer that compacts all features into a vector for the final softmax layer, which in turn outputs the classifier labels and their associated probabilities.
 
-Mathematically, the convolution operation performed in CNNs' initial layers can be expressed as:
+% Mathematically, the convolution operation performed in CNNs' initial layers can be expressed as:
 
-\begin{equation}
-Z(i,j) = (I * K)(i,j) = \sum_m \sum_n I(m,n) K(i-m,j-n)
-\end{equation}
+% \begin{equation}
+% Z(i,j) = (I * K)(i,j) = \sum_m \sum_n I(m,n) K(i-m,j-n)
+% \end{equation}
 
-Here, $I$ is the input image, $K$ the filter kernel, and $Z(i,j)$ the output feature map matrix. The filter is applied to each element of the input image, with the resultant values summed to form each output matrix element.
+% Here, $I$ is the input image, $K$ the filter kernel, and $Z(i,j)$ the output feature map matrix. The filter is applied to each element of the input image, with the resultant values summed to form each output matrix element.
 
-Each layer's output is computed via:
+% Each layer's output is computed via:
 
-\begin{equation}
-A^{(l)} = g(Z^{(l)}) = g(W^{(l)}A^{(l-1)} + b^{(l)})
-\end{equation}
+% \begin{equation}
+% A^{(l)} = g(Z^{(l)}) = g(W^{(l)}A^{(l-1)} + b^{(l)})
+% \end{equation}
 
-In this equation, $W^{(l)}$ and $b^{(l)}$ denote the weights and biases of the $l$-th layer respectively, $A^{(l-1)}$ is the input feature map, $g$ represents the activation function, and $Z^{(l)}$ is the weighted sum of input features.
+% In this equation, $W^{(l)}$ and $b^{(l)}$ denote the weights and biases of the $l$-th layer respectively, $A^{(l-1)}$ is the input feature map, $g$ represents the activation function, and $Z^{(l)}$ is the weighted sum of input features.
 
-The final softmax layer computes classifier labels as follows:
+% The final softmax layer computes classifier labels as follows:
 
-\begin{equation}
-P(y=j|x) = \frac{e^{z_j}}{\sum_{k=1}^K e^{z_k}}
-\end{equation}
+% \begin{equation}
+% P(y=j|x) = \frac{e^{z_j}}{\sum_{k=1}^K e^{z_k}}
+% \end{equation}
 
-Here, $P(y=j|x)$ is the probability of classifying the image as label $j$, $z_j$ refers to the weighted sum of features for label $j$, and $K$ is the total number of labels \cite{Smeda}.
+% Here, $P(y=j|x)$ is the probability of classifying the image as label $j$, $z_j$ refers to the weighted sum of features for label $j$, and $K$ is the total number of labels \cite{Smeda}.
 
 
 \subsection{MobileNetV3}
@@ -315,11 +313,15 @@ Training Resources & 8x NVIDIA V100 GPUs \\
 
 \section{Experimental Results}
 
-Despite a brief 20-epoch training phase, Google Colab's free environment constrained the epoch count due to slower processing speed compared to local hardware. \emph{Table \ref{table:MNParam}} and \emph{Table \ref{table:NNMParam}} detail the training hyperparameters for each model. Performance evaluation of both models relied on metrics such as accuracy, recall, precision, and F1-score. \emph{Table \ref{table:MNCM}} and \emph{Table \ref{table:MNPerformance}}  present the confusion matrix and performance metrics for MobileNetV3, while \emph{Table \ref{table:NNMCM}}, and \emph{Table \ref{table:NNMPerformance}} detail the same for NASNetMobile.  
+Despite a brief 20-epoch training phase, Google Colab's free environment constrained the epoch count due to slower processing speed compared to local hardware. \emph{Table \ref{table:MNParam}} and \emph{Table \ref{table:NNMParam}} detail the training hyperparameters for each model. Performance evaluation of both models relied on metrics such as accuracy, recall, precision, and F1-score. 
+%\emph{Table \ref{table:MNCM}} and 
+\emph{Table \ref{table:MNPerformance}}  present the confusion matrix and performance metrics for MobileNetV3, while 
+%\emph{Table \ref{table:NNMCM}}, and 
+\emph{Table \ref{table:NNMPerformance}} detail the same for NASNetMobile.  
 
 \begin{table}[htbp]
     \centering
-    \caption{MobileNetV3 - Hyperparameters}
+    \caption{MobileNetV3 - Training Hyperparameters}
     \begin{tabularx}{1\columnwidth}{X|>{\centering\arraybackslash}X}
     \hline
     \multicolumn{1}{c|}{\textbf{Parameter}} & \multicolumn{1}{c}{\textbf{Value}} \\
@@ -339,7 +341,7 @@ Despite a brief 20-epoch training phase, Google Colab's free environment constra
 
 \begin{table}[htbp]
     \centering
-    \caption{NASNetMobile - Hyperparameters}
+    \caption{NASNetMobile - Training Hyperparameters}
     \begin{tabularx}{1\columnwidth}{X|>{\centering\arraybackslash}X}
     \hline
     \multicolumn{1}{c|}{\textbf{Parameter}} & \multicolumn{1}{c}{\textbf{Value}} \\
@@ -366,29 +368,30 @@ According to TensorFlow metrics, after 20 training steps, the training and valid
 \label{MNStats}
 \end{figure}
 
-To evaluate model accuracy and robustness, we isolated 106 test images from the training process, using them as diverse, unseen data for performance assessment. This test phase gauges the model's generalization ability, essential for real-world applications. The test phase performances are presented in a confusion matrix in \emph{Table \ref{table:MNCM}}.
+To evaluate model accuracy and robustness, we isolated 106 test images from the training process, using them as diverse, unseen data for performance assessment. 
+% This test phase gauges the model's generalization ability, essential for real-world applications. The test phase performances are presented in a confusion matrix in \emph{Table \ref{table:MNCM}}.
 
-\begin{table}[htbp]
-    \centering
-    \caption{MobileNetV3 - Confusion Matrix}
-    \label{table:MNCM}
-    \begin{tabularx}{0.49\textwidth }{ 
-        >{\centering\arraybackslash}X 
-        >{\centering\arraybackslash}X 
-        >{\centering\arraybackslash}X 
-        >{\centering\arraybackslash}X 
-        >{\centering\arraybackslash}X
-        }
-    \hline
-    \textbf{Class (images)} & \textbf{Fresh Leaf} & \textbf{Fresh Plant} & \textbf{Diseased Leaf} & \textbf{Diseased Plant} \\
-    \hline 
-    Fresh Leaf (26) & 24 & 0 & 2 & 0 \\
-    Fresh Plant (27) & 0 & 22 & 0 & 5 \\
-    Diseased Leaf (25) & 0 & 0 & 24 & 1 \\ 
-    Diseased Plant (28) & 0 & 0 & 0 & 28 \\
-    \hline
-    \end{tabularx} 
-\end{table}
+% \begin{table}[htbp]
+%     \centering
+%     \caption{MobileNetV3 - Confusion Matrix}
+%     \label{table:MNCM}
+%     \begin{tabularx}{0.49\textwidth }{ 
+%         >{\centering\arraybackslash}X 
+%         >{\centering\arraybackslash}X 
+%         >{\centering\arraybackslash}X 
+%         >{\centering\arraybackslash}X 
+%         >{\centering\arraybackslash}X
+%         }
+%     \hline
+%     \textbf{Class (images)} & \textbf{Fresh Leaf} & \textbf{Fresh Plant} & \textbf{Diseased Leaf} & \textbf{Diseased Plant} \\
+%     \hline 
+%     Fresh Leaf (26) & 24 & 0 & 2 & 0 \\
+%     Fresh Plant (27) & 0 & 22 & 0 & 5 \\
+%     Diseased Leaf (25) & 0 & 0 & 24 & 1 \\ 
+%     Diseased Plant (28) & 0 & 0 & 0 & 28 \\
+%     \hline
+%     \end{tabularx} 
+% \end{table}
 
 The overall accuracy of the proposed model is given by equation \ref{eq:oa}:
 \begin{equation}
@@ -441,29 +444,29 @@ A similar evaluation process was performed for NASNetMobile. Shown in \emph{Fig.
 \label{NNMStats}
 \end{figure}
 
-The same 106 test images used for MobileNetV3 were also isolated to evaluate NASNetMobile's accuracy and robustness. It is imperative to note that high training metrics don't assure optimal test performance. NASNetMobile's confusion matrix is displayed in \emph{Table \ref{table:NNMCM}}.
+The same 106 test images used for MobileNetV3 were also isolated to evaluate NASNetMobile's accuracy. It is imperative to note that high training metrics don't assure optimal test performance. %NASNetMobile's confusion matrix is displayed in \emph{Table \ref{table:NNMCM}}.
 
-\begin{table}[htbp]
-    \centering
-    \caption{NASNetMobile - Confusion Matrix}
-    \label{table:NNMCM}
-    \begin{tabularx}{0.49\textwidth }{ 
-        >{\centering\arraybackslash}X 
-        >{\centering\arraybackslash}X 
-        >{\centering\arraybackslash}X 
-        >{\centering\arraybackslash}X 
-        >{\centering\arraybackslash}X
-        }
-    \hline
-    \textbf{Class (images)} & \textbf{Fresh Leaf} & \textbf{Fresh Plant} & \textbf{Diseased Leaf} & \textbf{Diseased Plant} \\
-    \hline 
-    Fresh Leaf (26) & 26 & 0 & 0 & 0 \\
-    Fresh Plant (27) & 1 & 25 & 0 & 1 \\
-    Diseased Leaf (25) & 2 & 0 & 23 & 0 \\
-    Diseased Plant (28) & 0 & 0 & 0 & 28 \\
-    \hline
-    \end{tabularx} 
-\end{table}
+% \begin{table}[htbp]
+%     \centering
+%     \caption{NASNetMobile - Confusion Matrix}
+%     \label{table:NNMCM}
+%     \begin{tabularx}{0.49\textwidth }{ 
+%         >{\centering\arraybackslash}X 
+%         >{\centering\arraybackslash}X 
+%         >{\centering\arraybackslash}X 
+%         >{\centering\arraybackslash}X 
+%         >{\centering\arraybackslash}X
+%         }
+%     \hline
+%     \textbf{Class (images)} & \textbf{Fresh Leaf} & \textbf{Fresh Plant} & \textbf{Diseased Leaf} & \textbf{Diseased Plant} \\
+%     \hline 
+%     Fresh Leaf (26) & 26 & 0 & 0 & 0 \\
+%     Fresh Plant (27) & 1 & 25 & 0 & 1 \\
+%     Diseased Leaf (25) & 2 & 0 & 23 & 0 \\
+%     Diseased Plant (28) & 0 & 0 & 0 & 28 \\
+%     \hline
+%     \end{tabularx} 
+% \end{table}
 
 Evaluating the NASNetMobile model during the test phase, delivered high accuracy for each label, achieving an overall accuracy of 97.7\%, outperforming MobileNetV3's 96.7\%. Despite being older and smaller, NASNetMobile outclassed MobileNetV3 in all categories, as demonstrated in \emph{Table \ref{table:NNMPerformance}}. Notably, it overcame MobileNetV3's classification challenge with Fresh Cotton Plants. 
 
@@ -512,15 +515,13 @@ By expanding the dataset, possibly through merging distinct sources with specifi
 
 \subsection{Scalability}
 
-
+Assessing individual leaf or plant health could be extrapolated to predict an entire cotton farm's health status, facilitated by the use of unmanned aerial vehicles for large-scale scanning. This large area classifier, combined with climate data and field estimates, could enable precise forecasting of a season's cotton yield in mass, subsequently translatable to a projected financial return.
 
 \section{Conclusion}
 
 This study highlights the simplicity and efficiency of transfer learning for training two advanced mobile-compatible models, NASNetMobile and MobileNetV3. Fine-tuning these models for cotton health classification yielded overall accuracies of 97.7\% and 96.7\% respectively, demonstrating NASNetMobile's superior performance, despite having fewer trainable parameters and being older. Notably, NASNetMobile excelled in identifying fresh cotton plants, a task challenging for MobileNetV3, likely due to NASNetMobile's self-updating architecture during training. The straightforward deployment of these models on an iOS application via TensorFlow Lite underscores the feasibility of this process, requiring only basic hardware and minimal upfront costs.
 
 \section{Acknowledgment}
-
-The authors extend their profound gratitude to the following individuals whose valuable insights, technical advice, and feedback significantly contributed to the realization of this research. 
 
 We thank Dr. Hyuk Cho (Sam Houston State University) for his instrumental role in proposing the research topic, providing the initial dataset, and offering continuous insightful guidance. We thank Caitlyn T. Landrum and David C. Schmitt for providing technical contributions to the figures. We thank Stephen W. Smith for useful discussions.
 
